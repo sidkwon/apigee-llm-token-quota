@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Environment Configuration Template
+# Copy this file to set-env.sh and update with your values
+# Usage: source ./set-env.sh
+
+export PROJECT="YOUR_PROJECT_ID"
+export APIGEE_HOST="YOUR_APIGEE_HOST"
+export APIGEE_ENV="YOUR_ENV"
+export SERVICE_ACCOUNT="YOUR_SERVICE_ACCOUNT"
+export REGION="asia-northeast3"

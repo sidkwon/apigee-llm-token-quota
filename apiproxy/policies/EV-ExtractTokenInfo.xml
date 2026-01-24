@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ExtractVariables continueOnError="false" enabled="true" name="EV-ExtractTokenInfo">
+  <DisplayName>EV-ExtractTokenInfo</DisplayName>
+  <Source clearPayload="false">tokenInfoResponse</Source>
+  <JSONPayload>
+    <Variable name="google.email">
+      <JSONPath>$.email</JSONPath>
+    </Variable>
+  </JSONPayload>
+  <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+</ExtractVariables>

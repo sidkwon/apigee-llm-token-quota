@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<APIProxy revision="27" name="llm-token-limits-v2">
+  <DisplayName/>
+  <Description/>
+  <CreatedAt>1768971948171</CreatedAt>
+  <LastModifiedAt>1768971948171</LastModifiedAt>
+  <BasePaths>/v2/samples/llm-token-limits</BasePaths>
+  <Policies>
+    <Policy>AM-ExtractTokenCount</Policy>
+    <Policy>DC-CollectTokenCounts</Policy>
+    <Policy>EV-ExtractRequest</Policy>
+    <Policy>LTQ-TokenCount</Policy>
+    <Policy>LTQ-TokenEnforce</Policy>
+    <Policy>VA-VerifyAPIKey</Policy>
+    <Policy>JS-ExtractClaudeTokens</Policy>
+    <Policy>SC-CallClaudeAPI</Policy>
+  </Policies>
+  <ProxyEndpoints>
+    <ProxyEndpoint>default</ProxyEndpoint>
+  </ProxyEndpoints>
+  <Resources>
+    <Resource>properties://vertex_config.properties</Resource>
+    <Resource>jsc://ExtractClaudeTokens.js</Resource>
+  </Resources>
+  <TargetEndpoints>
+    <TargetEndpoint>default</TargetEndpoint>
+  </TargetEndpoints>
+</APIProxy>

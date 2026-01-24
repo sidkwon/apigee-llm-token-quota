@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DataCapture name="DC-CollectTokenCounts" continueOnError="false" enabled="true">
+  <DisplayName>DC-CollectTokenCounts</DisplayName>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <Capture>
+    <Collect ref="candidates_token_count"/>
+    <DataCollector>dc_candidates_token_count_v2</DataCollector>
+  </Capture>
+  <Capture>
+    <Collect ref="prompt_token_count"/>
+    <DataCollector>dc_prompt_token_count_v2</DataCollector>
+  </Capture>
+  <Capture>
+    <Collect ref="total_token_count"/>
+    <DataCollector>dc_total_token_count_v2</DataCollector>
+  </Capture>
+</DataCapture>

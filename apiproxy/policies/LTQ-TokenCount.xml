@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<LLMTokenQuota continueOnError="false" enabled="true" name="LTQ-TokenCount" type="calendar">
+  <DisplayName>LTQ-TokenCount</DisplayName>
+  <Allow count="10000" countRef="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.limit"/>
+  <Interval ref="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.interval">1</Interval>
+  <TimeUnit ref="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.timeunit">minute</TimeUnit>
+  <Identifier ref="google.email"/>
+  <Distributed>true</Distributed>
+  <Synchronous>true</Synchronous>
+  <!-- StartTime 요소는 "calendar" 타입일 때 필수입니다. -->
+  <!-- 과거의 특정 시점을 기준으로 Quota 기간을 정렬합니다. -->
+  <StartTime>2024-01-01 00:00:00</StartTime>
+  <LLMTokenUsageSource>{total_token_count}</LLMTokenUsageSource>
+  <LLMModelSource>{model}</LLMModelSource>
+  <CountOnly>true</CountOnly>
+  <SharedName>common-counter</SharedName>
+</LLMTokenQuota>

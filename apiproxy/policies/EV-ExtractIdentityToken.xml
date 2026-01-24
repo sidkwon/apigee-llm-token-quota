@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ExtractVariables continueOnError="false" enabled="true" name="EV-ExtractIdentityToken">
+    <DisplayName>EV-ExtractIdentityToken</DisplayName>
+    <Source clearPayload="false">request</Source>
+    <Header name="Authorization">
+        <Pattern ignoreCase="false">Bearer {identity_token}</Pattern>
+    </Header>
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+</ExtractVariables>

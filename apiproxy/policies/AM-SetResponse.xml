@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage continueOnError="false" enabled="true" name="AM-SetResponse">
+  <DisplayName>AM-SetResponse</DisplayName>
+  <Copy source="calloutResponse">
+    <Headers/>
+    <StatusCode/>
+    <ReasonPhrase/>
+  </Copy>
+  <Set>
+    <StatusCode>{calloutResponse.status.code}</StatusCode>
+    <ReasonPhrase>{calloutResponse.reason.phrase}</ReasonPhrase>
+    <Payload contentType="application/json">{calloutResponse.content}</Payload>
+  </Set>
+  <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

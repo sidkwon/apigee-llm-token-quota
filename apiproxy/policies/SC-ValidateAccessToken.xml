@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ServiceCallout continueOnError="false" enabled="true" name="SC-ValidateAccessToken">
+  <DisplayName>SC-ValidateAccessToken</DisplayName>
+  <Properties/>
+  <Request clearPayload="true" variable="tokenValidationRequest">
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+    <Set>
+      <Verb>GET</Verb>
+    </Set>
+  </Request>
+  <Response>tokenInfoResponse</Response>
+  <HTTPTargetConnection>
+    <Properties/>
+    <URL>https://oauth2.googleapis.com/tokeninfo?access_token={identity_token}</URL>
+  </HTTPTargetConnection>
+</ServiceCallout>
