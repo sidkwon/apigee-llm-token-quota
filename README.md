@@ -91,7 +91,7 @@ Before deploying, ensure your Apigee environment is provisioned and accessible. 
 The Service Account used by the Proxy (`apigee-demo`) must have the **Vertex AI User** role (`roles/aiplatform.user`) to invoke the Gemini/Claude API.
 
 ```bash
-gcloud projects add-iam-policy-binding "dm-project-391900" \
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
   --member="serviceAccount:YOUR_SERVICE_ACCOUNT" \
   --role="roles/aiplatform.user"
 ```
