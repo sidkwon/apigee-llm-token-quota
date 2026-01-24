@@ -114,7 +114,7 @@ export PROJECT="YOUR_PROJECT_ID"
 export APIGEE_ENV="YOUR_ENV"
 export SERVICE_ACCOUNT="YOUR_SERVICE_ACCOUNT"
 
-./deploy-custom.sh
+./deploy-llm-token-limits-v2.sh
 ```
 
 ## 🧪 Testing with Claude Code
@@ -132,6 +132,18 @@ Ensure your `~/.claude/settings.json` is configured to use Vertex AI. The client
 }
 ```
 
+
+## 🧹 Cleanup
+
+To remove the deployed resources (Proxies, Products, Apps) *without* deleting the Apigee Environment:
+
+```bash
+# Variables must match deployment
+export PROJECT="YOUR_PROJECT_ID"
+export APIGEE_ENV="YOUR_ENV"
+
+./undeploy-llm-token-limits-v2.sh
+```
 
 ---
 ✨ This codebase was built with the help of <a href="https://antigravity.google/" target="_blank">Google Antigravity</a>! 🚀

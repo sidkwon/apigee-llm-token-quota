@@ -24,10 +24,6 @@ if [ -z "$APIGEE_ENV" ]; then
   exit
 fi
 
-if [ -z "$APIGEE_HOST" ]; then
-  echo "No APIGEE_HOST variable set"
-  exit
-fi
 
 echo "Installing apigeecli"
 curl -s https://raw.githubusercontent.com/apigee/apigeecli/main/downloadLatest.sh | bash

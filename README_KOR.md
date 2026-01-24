@@ -100,7 +100,7 @@ export PROJECT="YOUR_PROJECT_ID"
 export APIGEE_ENV="YOUR_ENV"
 export SERVICE_ACCOUNT="YOUR_SERVICE_ACCOUNT"
 
-./deploy-custom.sh
+./deploy-llm-token-limits-v2.sh
 ```
 
 ## 🧪 Claude Code 테스트
@@ -118,6 +118,18 @@ export SERVICE_ACCOUNT="YOUR_SERVICE_ACCOUNT"
 }
 ```
 
+
+## 🧹 리소스 정리 (Cleanup)
+
+Apigee 환경(Environment)은 유지하면서 배포된 리소스(Proxy, Product, App 등)만 삭제하려면 다음 스크립트를 실행하세요:
+
+```bash
+# 배포 시 사용한 변수와 동일하게 설정
+export PROJECT="YOUR_PROJECT_ID"
+export APIGEE_ENV="YOUR_ENV"
+
+./undeploy-llm-token-limits-v2.sh
+```
 
 ---
 ✨ This codebase was built with the help of <a href="https://antigravity.google/" target="_blank">Google Antigravity</a>! 🚀
