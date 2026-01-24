@@ -134,4 +134,4 @@ Ensure your `~/.claude/settings.json` is configured to use Vertex AI. The client
 
 
 ---
-✨ This codebase was built with the help of [Google Antigravity](https://antigravity.google/)! 🚀
+✨ This codebase was built with the help of <a href="https://antigravity.google/" target="_blank">Google Antigravity</a>! 🚀
