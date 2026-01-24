@@ -132,18 +132,6 @@ Ensure your `~/.claude/settings.json` is configured to use Vertex AI. The client
 }
 ```
 
-## ❓ Troubleshooting
-
-### 1. Silent Response or "Echo" (HTTP 200 OK)
-- **Symptom**: `claude-code` shows no output, or `curl` returns the request body (Echo).
-- **Cause**: The Proxy was failing to stream the Vertex AI response correctly in default configurations.
-- **Fix**: This project now explicitly sets the Response Payload in `AM-SetResponse`. Ensure your `AM-SetResponse.xml` includes `<Payload contentType="application/json">{calloutResponse.content}</Payload>`.
-
-### 2. HTTP 400 Bad Request
-- **Symptom**: `curl` returns 400 with `max_tokens` error.
-- **Message**: `"message": "'max_tokens' must be greater than 'thinking.budget_tokens'..."`
-- **Cause**: The client request has contradictory settings (e.g., Extended Thinking budget exceeds Max Tokens).
-- **Fix**: Adjust your `max_tokens` in the client configuration to be larger than the thinking budget.
 
 ---
-This codebase was written with the help of Google Antigravity.
+✨ This codebase was built with the help of [Google Antigravity](https://labs.google.com/antigravity)! 🚀

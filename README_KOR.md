@@ -118,18 +118,6 @@ export SERVICE_ACCOUNT="YOUR_SERVICE_ACCOUNT"
 }
 ```
 
-## ❓ 트러블슈팅 (Troubleshooting)
-
-### 1. 응답 없음 또는 "Echo" 현상 (HTTP 200 OK)
-- **증상**: `claude-code`가 아무 반응이 없거나, `curl` 실행 시 요청한 JSON이 그대로 반환됨.
-- **원인**: Apigee 프록시가 Vertex AI의 스트리밍 응답을 제대로 전달하지 못하고 기본 동작(Echo)을 수행함.
-- **해결**: 현재 버전은 `AM-SetResponse` 정책에서 응답을 강제로 설정하도록 수정되었습니다. `AM-SetResponse.xml` 파일에 `<Payload ...>{calloutResponse.content}</Payload>` 설정이 있는지 확인하세요.
-
-### 2. HTTP 400 Bad Request
-- **증상**: `curl` 요청 시 400 에러 발생.
-- **메시지**: `"message": "'max_tokens' must be greater than 'thinking.budget_tokens'..."`
-- **원인**: 클라이언트 요청에서 "생각하는 시간(Thinking Budget)"이 "전체 토큰 제한(Max Tokens)"보다 크거나 같게 설정되어 발생한 논리적 모순입니다.
-- **해결**: 클라이언트 설정에서 `max_tokens` 값을 충분히 늘려주세요.
 
 ---
-This codebase was written with the help of Google Antigravity.
+✨ This codebase was built with the help of [Google Antigravity](https://labs.google.com/antigravity)! 🚀
