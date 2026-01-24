@@ -120,4 +120,4 @@ export SERVICE_ACCOUNT="YOUR_SERVICE_ACCOUNT"
 
 
 ---
-✨ This codebase was built with the help of [Google Antigravity](https://labs.google.com/antigravity)! 🚀
+✨ This codebase was built with the help of [Google Antigravity](https://antigravity.google/)! 🚀
