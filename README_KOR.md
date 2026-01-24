@@ -21,7 +21,7 @@
 
 ```mermaid
 graph TD
-    Client[Client (Claude Code)] -->|"1. Request + Access Token (ya29...)"| Apigee[Apigee Proxy]
+    Client["Client (Claude Code)"] -->|"1. Request + Access Token (ya29...)"| Apigee[Apigee Proxy]
     
     subgraph "Apigee Proxy"
         VA_Verify["VA-VerifyAPIKey<br/>(Check API Product Limit)"]
