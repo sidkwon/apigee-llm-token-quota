@@ -109,15 +109,29 @@ Visit [Vertex AI Model Garden](https://console.cloud.google.com/vertex-ai/model-
 Use the provided custom script to deploy to your environment.
 
 ```bash
-# Update these variables in the script if needed
-export PROJECT="YOUR_PROJECT_ID"
-export APIGEE_ENV="YOUR_ENV"
-export SERVICE_ACCOUNT="YOUR_SERVICE_ACCOUNT"
+# 1. Create and configure environment variables
+cp set-env.sh.example set-env.sh
+vi set-env.sh  # Update with your values
+source ./set-env.sh
 
+# 2. Deploy
 ./deploy-llm-token-limits-v2.sh
 ```
 
-## 🧪 Testing with Claude Code
+## � Automated Quota Testing
+
+You can use the provided `test-quota.sh` script to verify the quota enforcement by sending multiple complex prompts.
+
+```bash
+# Set your API Key (Bronze or Silver)
+export API_KEY="YOUR_API_KEY"
+export APIGEE_HOST="YOUR_APIGEE_HOST"
+
+# Run 20 requests (default)
+./test-quota.sh 20
+```
+
+## �🧪 Testing with Claude Code
 
 Ensure your `~/.claude/settings.json` is configured to use Vertex AI. The client will automatically send the Google Access Token.
 
@@ -127,7 +141,9 @@ Ensure your `~/.claude/settings.json` is configured to use Vertex AI. The client
     "CLAUDE_CODE_USE_VERTEX": "1",
     "ANTHROPIC_VERTEX_PROJECT_ID": "YOUR_PROJECT_ID",
     "ANTHROPIC_VERTEX_BASE_URL": "https://YOUR_APIGEE_HOST/v2/samples/llm-token-limits/v1",
-    "ANTHROPIC_CUSTOM_HEADERS": "x-apikey: YOUR_API_KEY"
+    "ANTHROPIC_CUSTOM_HEADERS": "x-apikey: YOUR_API_KEY",
+    "ANTHROPIC_MODEL": "claude-sonnet-4-5@20250929",
+    "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5@20251001"
   }
 }
 ```
