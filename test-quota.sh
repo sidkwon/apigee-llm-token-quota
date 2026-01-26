@@ -23,12 +23,14 @@ PROJECT=${PROJECT:-"YOUR_PROJECT_ID"}
 APIGEE_HOST=${APIGEE_HOST:-"YOUR_APIGEE_HOST"}
 # Fetch Bronze Key dynamically
 echo "Fetching Bronze API Key..."
-API_KEY=$(apigeecli apps get --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN" --disable-check 2>/dev/null | jq -r '.[0].credentials[] | select(.apiProducts[0].apiproduct=="ai-product-bronze-v2").consumerKey')
+# API_KEY=$(apigeecli apps get --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN" --disable-check 2>/dev/null | jq -r '.[0].credentials[] | select(.apiProducts[0].apiproduct=="ai-product-bronze-v2").consumerKey')
 
-if [ -z "$API_KEY" ] || [ "$API_KEY" == "null" ]; then
-    echo "❌ Failed to fetch API Key. Please ensure 'apigeecli' and 'jq' are installed and you are logged in."
-    exit 1
-fi
+# if [ -z "$API_KEY" ] || [ "$API_KEY" == "null" ]; then
+#     echo "❌ Failed to fetch API Key. Please ensure 'apigeecli' and 'jq' are installed and you are logged in."
+#     exit 1
+# fi
+API_KEY=$API_KEY
+
 echo "Using API Key: $API_KEY"
 
 URL="https://$APIGEE_HOST/v2/samples/llm-token-limits/v1/projects/$PROJECT/locations/global/publishers/anthropic/models/claude-sonnet-4-5@20250929:streamRawPredict"
