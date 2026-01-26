@@ -118,7 +118,7 @@ source ./set-env.sh
 ./deploy-llm-token-limits-v2.sh
 ```
 
-## � Automated Quota Testing
+## 🤖 Automated Quota Testing
 
 You can use the provided `test-quota.sh` script to verify the quota enforcement by sending multiple complex prompts.
 
@@ -131,7 +131,7 @@ export APIGEE_HOST="YOUR_APIGEE_HOST"
 ./test-quota.sh 20
 ```
 
-## �🧪 Testing with Claude Code
+## 🧪 Testing with Claude Code
 
 Ensure your `~/.claude/settings.json` is configured to use Vertex AI. The client will automatically send the Google Access Token.
 
