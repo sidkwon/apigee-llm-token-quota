@@ -142,8 +142,8 @@ Ensure your `~/.claude/settings.json` is configured to use Vertex AI. The client
     "ANTHROPIC_VERTEX_PROJECT_ID": "YOUR_PROJECT_ID",
     "ANTHROPIC_VERTEX_BASE_URL": "https://YOUR_APIGEE_HOST/v2/samples/llm-token-limits/v1",
     "ANTHROPIC_CUSTOM_HEADERS": "x-apikey: YOUR_API_KEY",
-    "ANTHROPIC_MODEL": "claude-sonnet-4-5@20250929",
-    "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5@20251001"
+    "ANTHROPIC_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5
   }
 }
 ```

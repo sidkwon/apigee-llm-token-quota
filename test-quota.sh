@@ -78,7 +78,6 @@ for i in $(seq 1 $COUNT); do
     # Extract Debug Headers if present
     QUOTA_USED=$(echo "$RESPONSE" | grep -i "x-debug-quota-used" | awk '{print $2}' | tr -d '\r')
     
-    echo "$RESPONSE"
     echo "-> Status: $STATUS | Quota Used: ${QUOTA_USED:-N/A}"
     
     if [ "$STATUS" == "429" ]; then
