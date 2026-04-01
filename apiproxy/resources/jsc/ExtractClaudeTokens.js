@@ -23,12 +23,31 @@ var candidatesCount = 0;
 if (rawContent && typeof rawContent === 'string') {
     context.setVariable("debug.js.rawContentLength", rawContent.length);
     try {
-        // 줄 단위로 분리 (CRLF 및 LF 지원)
-        var lines = rawContent.split(/\r?\n/);
-        context.setVariable("debug.js.lineCount", lines.length);
-        var dataBuffer = "";
-        var eventType = null;
-        var blockIndex = 0;
+        var parsedAsJson = false;
+        try {
+            var jsonObj = JSON.parse(rawContent);
+            if (jsonObj && jsonObj.usage) {
+                promptCount = jsonObj.usage.input_tokens || 0;
+                candidatesCount = jsonObj.usage.output_tokens || 0;
+                parsedAsJson = true;
+            }
+        } catch (e) {
+            // Not a single JSON, proceed to SSE parsing
+        }
+
+        if (parsedAsJson) {
+            var totalCount = promptCount + candidatesCount;
+            context.setVariable("prompt_token_count", java.lang.Integer.valueOf(promptCount));
+            context.setVariable("candidates_token_count", java.lang.Integer.valueOf(candidatesCount));
+            context.setVariable("total_token_count", java.lang.Integer.valueOf(totalCount));
+            context.setVariable("debug.js.parsedType", "single_json");
+        } else {
+            // 줄 단위로 분리 (CRLF 및 LF 지원)
+            var lines = rawContent.split(/\r?\n/);
+            context.setVariable("debug.js.lineCount", lines.length);
+            var dataBuffer = "";
+            var eventType = null;
+            var blockIndex = 0;
 
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
@@ -72,6 +91,7 @@ if (rawContent && typeof rawContent === 'string') {
         context.setVariable("candidates_token_count", java.lang.Integer.valueOf(candidatesCount));
         context.setVariable("total_token_count", java.lang.Integer.valueOf(totalCount));
 
+        }
     } catch (e) {
         context.setVariable("debug.js.topLevelError", e.message);
     }

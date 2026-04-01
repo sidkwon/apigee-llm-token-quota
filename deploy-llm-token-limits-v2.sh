@@ -64,7 +64,7 @@ fi
 
 export SERVICE_ACCOUNT="${SERVICE_ACCOUNT:-YOUR_SERVICE_ACCOUNT}"
 
-REV=$(apigeecli apis create bundle -f ./apiproxy -n llm-token-limits-v2 --org "$PROJECT" --token "$TOKEN" --disable-check | jq ."revision" -r)
+REV=$(apigeecli apis create bundle -f ./apiproxy -n llm-token-limits-v2 --org "$PROJECT" --token "$TOKEN" --disable-check | python3 -c "import json, sys; data=json.load(sys.stdin); print(data.get('revision', ''))")
 if [ -z "$REV" ] || [ "$REV" == "null" ]; then
     echo "Error creating API proxy bundle. Check output above."
     exit 1
@@ -75,7 +75,7 @@ apigeecli apis deploy --wait --name llm-token-limits-v2 --ovr --rev "$REV" --org
 
 # Products and Apps
 echo "Creating AI Products..."
-apigeecli products create --name ai-product-bronze-v2 --display-name "AI Product Bronze v2" --envs "$APIGEE_ENV" --scopes "READ" --scopes "WRITE" --scopes "ACTION" --approval auto --llmopgrp ./aiproduct-bronze.json --org "$PROJECT" --token "$TOKEN" 2>/dev/null || echo "Product Bronze might already exist (updating...)"
+apigeecli products create --name ai-product-bronze-v2 --display-name "AI Product Bronze v2" --envs "$APIGEE_ENV" --scopes "READ" --scopes "WRITE" --scopes "ACTION" --approval auto --llmopgrp ./aiproduct-bronze.json --org "$PROJECT" --token "$TOKEN" 2>/dev/null || echo "Product Bronze might already exist."
 # If create fails, maybe update? apigeecli doesn't have easy update-or-create, ignoring error for now as create handles existence check often or fails. 
 # Actually apigeecli usually fails if exists. 
 
@@ -90,8 +90,8 @@ apigeecli apps create --name ai-consumer-app-v2 --email aidev-v2@cymbal.com --pr
 # Add silver product if not present (logic implies just re-adding or ensuring key)
 apigeecli apps genkey --name ai-consumer-app-v2 -d aidev-v2@cymbal.com  --prods ai-product-silver-v2 --org "$PROJECT" --token "$TOKEN" --disable-check 2>/dev/null
 
-BRONZE_KEY=$(apigeecli apps get --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN" --disable-check | jq .'[0].credentials[]| select(.apiProducts[0].apiproduct=="ai-product-bronze-v2").consumerKey' -r)
-SILVER_KEY=$(apigeecli apps get --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN" --disable-check | jq .'[0].credentials[]| select(.apiProducts[0].apiproduct=="ai-product-silver-v2").consumerKey' -r)
+BRONZE_KEY=$(apigeecli apps get --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN" --disable-check | python3 -c "import json, sys; data=json.load(sys.stdin); print(next((c.get('consumerKey') for app in data for c in app.get('credentials', []) if any(p.get('apiproduct', '') == 'ai-product-bronze-v2' for p in c.get('apiProducts', []))), ''))")
+SILVER_KEY=$(apigeecli apps get --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN" --disable-check | python3 -c "import json, sys; data=json.load(sys.stdin); print(next((c.get('consumerKey') for app in data for c in app.get('credentials', []) if any(p.get('apiproduct', '') == 'ai-product-silver-v2' for p in c.get('apiProducts', []))), ''))")
 
 echo " "
 echo "All the Apigee artifacts are successfully deployed!"

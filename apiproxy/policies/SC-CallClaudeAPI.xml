@@ -31,6 +31,6 @@
       </GoogleAccessToken>
     </Authentication>
     <!-- Set the full URL for the Claude endpoint -->
-    <URL>https://aiplatform.googleapis.com/v1/projects/dm-project-391900/locations/global/publishers/anthropic/models/{model}:streamRawPredict</URL>
+    <URL>https://aiplatform.googleapis.com/v1/projects/{extracted_project}/locations/{extracted_location}/publishers/anthropic/models/{model}:streamRawPredict</URL>
   </HTTPTargetConnection>
 </ServiceCallout>

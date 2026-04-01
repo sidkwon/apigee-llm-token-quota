@@ -21,19 +21,24 @@ fi
 
 PROJECT=${PROJECT:-"YOUR_PROJECT_ID"}
 APIGEE_HOST=${APIGEE_HOST:-"YOUR_APIGEE_HOST"}
-# Fetch Bronze Key dynamically
-echo "Fetching Bronze API Key..."
-# API_KEY=$(apigeecli apps get --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN" --disable-check 2>/dev/null | jq -r '.[0].credentials[] | select(.apiProducts[0].apiproduct=="ai-product-bronze-v2").consumerKey')
+# Fetch Bronze Key dynamically if not set
+if [ -z "$API_KEY" ]; then
+  echo "Fetching Bronze API Key..."
+  API_KEY=$(apigeecli apps get --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN" --disable-check 2>/dev/null | python3 -c "import json, sys; data=json.load(sys.stdin); print(next((c.get('consumerKey') for app in data for c in app.get('credentials', []) if any(p.get('apiproduct', '') == 'ai-product-bronze-v2' for p in c.get('apiProducts', []))), ''))")
 
-# if [ -z "$API_KEY" ] || [ "$API_KEY" == "null" ]; then
-#     echo "❌ Failed to fetch API Key. Please ensure 'apigeecli' and 'jq' are installed and you are logged in."
-#     exit 1
-# fi
-API_KEY=$API_KEY
+fi
+
+if [ -z "$API_KEY" ] || [ "$API_KEY" == "null" ]; then
+    echo "❌ API Key is empty. Please ensure it is exported in your environment or 'apigeecli' can fetch it."
+    exit 1
+fi
 
 echo "Using API Key: $API_KEY"
 
-URL="https://$APIGEE_HOST/v2/samples/llm-token-limits/v1/projects/$PROJECT/locations/global/publishers/anthropic/models/claude-sonnet-4-5@20250929:streamRawPredict"
+# URL="https://$APIGEE_HOST/v2/samples/llm-token-limits/v1/projects/$PROJECT/locations/global/publishers/anthropic/models/claude-sonnet-4-5@20250929:streamRawPredict"
+URL="https://$APIGEE_HOST/v2/samples/llm-token-limits/v1/projects/$PROJECT/locations/global/publishers/anthropic/models/claude-sonnet-4-6:streamRawPredict"
+# URL="https://$APIGEE_HOST/v2/samples/llm-token-limits/v1/projects/$PROJECT/locations/global/publishers/anthropic/models/claude-haiku-4-5:streamRawPredict"
+
 
 # Define complex prompts
 PROMPTS=(
@@ -64,7 +69,7 @@ for i in $(seq 1 $COUNT); do
         \"messages\": [
           {\"role\": \"user\", \"content\": \"$SELECTED_PROMPT\"}
         ],
-        \"max_tokens\": 300
+        \"max_tokens\": 1024
       }")
     
     # Extract Status Code
@@ -73,6 +78,7 @@ for i in $(seq 1 $COUNT); do
     # Extract Debug Headers if present
     QUOTA_USED=$(echo "$RESPONSE" | grep -i "x-debug-quota-used" | awk '{print $2}' | tr -d '\r')
     
+    echo "$RESPONSE"
     echo "-> Status: $STATUS | Quota Used: ${QUOTA_USED:-N/A}"
     
     if [ "$STATUS" == "429" ]; then

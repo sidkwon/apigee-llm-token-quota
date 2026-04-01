@@ -33,7 +33,7 @@ TOKEN=$(gcloud auth print-access-token)
 gcloud config set project "$PROJECT"
 
 echo "Deleting Developer Apps"
-DEVELOPER_ID=$(apigeecli developers get --email aidev-v2@cymbal.com --org "$PROJECT" --token "$TOKEN" --disable-check | jq .'developerId' -r)
+DEVELOPER_ID=$(apigeecli developers get --email aidev-v2@cymbal.com --org "$PROJECT" --token "$TOKEN" --disable-check | python3 -c "import json, sys; data=json.load(sys.stdin); print(data.get('developerId', ''))")
 apigeecli apps delete --id "$DEVELOPER_ID" --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN"
 
 echo "Deleting Developer"
@@ -44,7 +44,7 @@ apigeecli products delete --name ai-product-bronze-v2 --org "$PROJECT" --token "
 apigeecli products delete --name ai-product-silver-v2 --org "$PROJECT" --token "$TOKEN"
 
 echo "Undeploying llm-token-limits-v2 proxy"
-REV=$(apigeecli envs deployments get --env "$APIGEE_ENV" --org "$PROJECT" --token "$TOKEN" --disable-check | jq .'deployments[]| select(.apiProxy=="llm-token-limits-v2").revision' -r)
+REV=$(apigeecli envs deployments get --env "$APIGEE_ENV" --org "$PROJECT" --token "$TOKEN" --disable-check | python3 -c "import json, sys; data=json.load(sys.stdin); print(next((d.get('revision') for d in data.get('deployments', []) if d.get('apiProxy') == 'llm-token-limits-v2'), ''))")
 apigeecli apis undeploy --name llm-token-limits-v2 --env "$APIGEE_ENV" --rev "$REV" --org "$PROJECT" --token "$TOKEN"
 
 echo "Deleting proxy llm-token-limits-v2 proxy"
@@ -52,7 +52,7 @@ apigeecli apis delete --name llm-token-limits-v2 --org "$PROJECT" --token "$TOKE
 
 echo "Deleting Token Consumption v2 Report"
 
-REPORT_NAME=$(curl "https://apigee.googleapis.com/v1/organizations/$PROJECT/reports?expand=true" --header "Authorization: Bearer $TOKEN" --header 'Accept: application/json' --compressed | jq .'qualifier[]| select(.displayName=="Tokens Consumption Report v2").name' -r)
+REPORT_NAME=$(curl "https://apigee.googleapis.com/v1/organizations/$PROJECT/reports?expand=true" --header "Authorization: Bearer $TOKEN" --header 'Accept: application/json' --compressed | python3 -c "import json, sys; data=json.load(sys.stdin); print(next((q.get('name') for q in data.get('qualifier', []) if q.get('displayName') == 'Tokens Consumption Report v2'), ''))")
 
 curl --request DELETE \
   "https://apigee.googleapis.com/v1/organizations/$PROJECT/reports/$REPORT_NAME" \
