@@ -23,13 +23,16 @@ This proxy demonstrates how to implement **User-Based LLM Token Quota** enforcem
 graph TD
     Client["Client (Claude Code)"] -->|"1. Request + Access Token (ya29...)"| Apigee[Apigee Proxy]
     
-    subgraph "Apigee Proxy"
+    subgraph "Apigee Proxy Endpoint"
         VA_Verify["VA-VerifyAPIKey<br/>(Check API Product Limit)"]
         SC_Validate["SC-ValidateAccessToken<br/>(Call Google TokenInfo)"]
         EV_Extract["EV-ExtractTokenInfo<br/>(Get google.email)"]
         LTQ_Enforce["LTQ-TokenEnforce<br/>(Identifier: google.email)"]
-        
-        SC_CallLLM["SC-CallClaudeAPI<br/>(Call Vertex AI with SA)"]
+    end
+    
+    subgraph "Apigee Target Endpoint"
+        Target["HTTPTargetConnection<br/>(aiplatform.googleapis.com)"]
+        JS_Extract["JS-ExtractClaudeTokens<br/>(Extract Tokens)"]
         LTQ_Count["LTQ-TokenCount<br/>(Consume Tokens)"]
     end
     
@@ -45,13 +48,13 @@ graph TD
     SC_Validate --> EV_Extract
     EV_Extract --> LTQ_Enforce
     
-    LTQ_Enforce -->|"If Quota OK"| SC_CallLLM
-    SC_CallLLM -->|"Analyze Prompt"| VertexAI
-    VertexAI -->|"Token Usage"| SC_CallLLM
+    LTQ_Enforce -->|"Route to Target"| Target
+    Target -->|"Analyze Prompt"| VertexAI
+    VertexAI -->|"Token Usage"| Target
     
-    SC_CallLLM --> LTQ_Count
-    LTQ_Count -->|"Update User Counter"| Apigee
-    Apigee -->|"Response (Direct)"| Client
+    Target --> JS_Extract
+    JS_Extract --> LTQ_Count
+    LTQ_Count -->|"Return Response"| Client
 
     style LTQ_Enforce fill:#ff9999,stroke:#333
     style LTQ_Count fill:#99ff99,stroke:#333
@@ -143,7 +146,7 @@ Ensure your `~/.claude/settings.json` is configured to use Vertex AI. The client
     "ANTHROPIC_VERTEX_BASE_URL": "https://YOUR_APIGEE_HOST/v2/samples/llm-token-limits/v1",
     "ANTHROPIC_CUSTOM_HEADERS": "x-apikey: YOUR_API_KEY",
     "ANTHROPIC_MODEL": "claude-sonnet-4-6",
-    "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5
+    "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5"
   }
 }
 ```
