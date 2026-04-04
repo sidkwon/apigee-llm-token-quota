@@ -13,10 +13,10 @@ context.setVariable("debug.js.candidatesTokenFound", false);
 context.setVariable("debug.js.jsonParseErrors", "");
 context.setVariable("debug.js.topLevelError", "");
 context.setVariable("debug.js.rawContentInvalid", false);
-context.setVariable("debug.js.targetVariable", "calloutResponse.content"); // 어떤 변수를 읽는지 명시
+context.setVariable("debug.js.targetVariable", "response.content"); // 어떤 변수를 읽는지 명시
 
 // SServiceCallout에서 지정한 'calloutResponse' 변수에서 content를 읽어옵니다.
-var rawContent = context.getVariable("calloutResponse.content");
+var rawContent = context.getVariable("response.content");
 var promptCount = 0;
 var candidatesCount = 0;
 

@@ -52,12 +52,6 @@
     <Request/>
     <Response>
       <Step>
-        <Name>SC-CallClaudeAPI</Name>
-      </Step>
-      <Step>
-        <Name>AM-SetResponse</Name>
-      </Step>
-      <Step>
         <Name>JS-ExtractClaudeTokens</Name>
       </Step>
       <Step>
@@ -73,5 +67,7 @@
     <Properties/>
     <BasePath>/v2/samples/llm-token-limits</BasePath>
   </HTTPProxyConnection>
-  <RouteRule name="no-route"/>
+  <RouteRule name="default">
+    <TargetEndpoint>default</TargetEndpoint>
+  </RouteRule>
 </ProxyEndpoint>

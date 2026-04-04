@@ -7,9 +7,27 @@
   <Flows/>
   <PostFlow name="PostFlow">
     <Request/>
-    <Response/>
+    <Response>
+      <Step>
+        <Name>JS-ExtractClaudeTokens</Name>
+      </Step>
+      <Step>
+        <Name>LTQ-TokenCount</Name>
+        <Condition>(total_token_count != null) and (total_token_count > 0)</Condition>
+      </Step>
+      <Step>
+        <Name>DC-CollectTokenCounts</Name>
+      </Step>
+    </Response>
   </PostFlow>
   <HTTPTargetConnection>
-    <URL>https://mocktarget.apigee.net</URL>
+    <URL>https://aiplatform.googleapis.com</URL>
+    <Authentication>
+      <GoogleAccessToken>
+        <Scopes>
+          <Scope>https://www.googleapis.com/auth/cloud-platform</Scope>
+        </Scopes>
+      </GoogleAccessToken>
+    </Authentication>
   </HTTPTargetConnection>
 </TargetEndpoint>
