@@ -17,6 +17,12 @@
     *   `oauth2.googleapis.com/tokeninfo`를 통해 Google 액세스 토큰을 검증합니다.
     *   클라이언트 측에 API 키를 노출하지 않도록 Apigee 서비스 계정(`apigee-demo`)을 통해 Vertex AI를 안전하게 호출합니다.
 
+4.  **보안 및 성능 강화 (Security & Performance Hardening)**:
+    *   **OAuth 토큰 캐싱**: 토큰 검증 결과를 300초 동안 캐싱하여 외부 API 호출 지연(Latency)을 단축하고 Google API 호출 속도 제한(Rate limits) 초과를 방지합니다.
+    *   **SSRF 방지**: 동적 리전별 백엔드 라우팅 시 엄격한 정규식 검증을 적용하여 호스트 헤더 변조 및 비정상 접근을 차단합니다.
+    *   **JSON Threat Protection**: 페이로드 구조 제약 조건(중첩 깊이, 배열 크기 등)을 강제하여 서비스 거부(DoS) 공격을 방어합니다.
+    *   **스트리밍(SSE) 지원**: Apigee `EventFlow` 응답 청크 처리를 통해 Server-Sent Events(SSE) 스트리밍 응답을 지원하며, `claude-code`와 같은 스트리밍 클라이언트 호출 시에도 누적 토큰 사용량을 정상 수집 및 차감합니다.
+
 ## 🏗️ 아키텍처 흐름
 
 ```mermaid

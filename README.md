@@ -17,6 +17,12 @@ This proxy demonstrates how to implement **User-Based LLM Token Quota** enforcem
     *   Validates Google Access Tokens via `oauth2.googleapis.com/tokeninfo`.
     *   Uses Apigee Service Account (`apigee-demo`) to securely invoke Vertex AI, removing the need for client-side keys.
 
+4.  **Security & Performance Hardening**:
+    *   **OAuth Token Caching**: Caches token validation mappings for 300 seconds to minimize external API call latency and prevent hitting Google API rate limits.
+    *   **SSRF Protection**: Performs strict regex validation on dynamic regional target locations to prevent host header injection.
+    *   **JSON Threat Protection**: Enforces structural payload constraints (depth, array/string sizes) to block Denial-of-Service (DoS) attacks.
+    *   **Streaming (SSE) Support**: Supports Server-Sent Events (SSE) responses via Apigee `EventFlow` response chunk processing, correctly tracking cumulative token usage for clients like `claude-code` that utilize streaming.
+
 ## 🏗️ Architecture Flow
 
 ```mermaid
