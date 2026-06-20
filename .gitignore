@@ -9,3 +9,7 @@ set-env.sh
 *.tfstate.backup
 *.tfvars
 .terraform.lock.hcl
+
+# Troubleshooting
+troubleshooting.md
+troubleshooting_KO.md
