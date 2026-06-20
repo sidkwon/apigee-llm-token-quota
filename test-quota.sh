@@ -69,7 +69,8 @@ for i in $(seq 1 $COUNT); do
         \"messages\": [
           {\"role\": \"user\", \"content\": \"$SELECTED_PROMPT\"}
         ],
-        \"max_tokens\": 1024
+        \"max_tokens\": 1024,
+        \"stream\": true
       }")
     
     # Extract Status Code

@@ -1,26 +1,25 @@
-// 1. 초기화: 변수가 null이 되어 XML의 default="0"이 실행되는 것을 원천 차단합니다.
-// 반드시 java.lang.Integer를 사용하여 '진짜 숫자'를 미리 박아넣습니다.
-context.setVariable("prompt_token_count", java.lang.Integer.valueOf(0));
-context.setVariable("candidates_token_count", java.lang.Integer.valueOf(0));
-context.setVariable("total_token_count", java.lang.Integer.valueOf(0));
-
-// 디버깅용 변수 초기화
-context.setVariable("debug.js.rawContentLength", 0);
-context.setVariable("debug.js.lineCount", 0);
-context.setVariable("debug.js.eventBlockCount", 0);
-context.setVariable("debug.js.promptTokenFound", false);
-context.setVariable("debug.js.candidatesTokenFound", false);
-context.setVariable("debug.js.jsonParseErrors", "");
-context.setVariable("debug.js.topLevelError", "");
-context.setVariable("debug.js.rawContentInvalid", false);
-context.setVariable("debug.js.targetVariable", "response.content"); // 어떤 변수를 읽는지 명시
-
 // SServiceCallout에서 지정한 'calloutResponse' 변수에서 content를 읽어옵니다.
 var rawContent = context.getVariable("response.content");
 var promptCount = 0;
 var candidatesCount = 0;
 
 if (rawContent && typeof rawContent === 'string') {
+    // 1. 초기화: 변수가 null이 되어 XML의 default="0"이 실행되는 것을 원천 차단합니다.
+    // 반드시 java.lang.Integer를 사용하여 '진짜 숫자'를 미리 박아넣습니다.
+    context.setVariable("prompt_token_count", java.lang.Integer.valueOf(0));
+    context.setVariable("candidates_token_count", java.lang.Integer.valueOf(0));
+    context.setVariable("total_token_count", java.lang.Integer.valueOf(0));
+
+    // 디버깅용 변수 초기화
+    context.setVariable("debug.js.rawContentLength", 0);
+    context.setVariable("debug.js.lineCount", 0);
+    context.setVariable("debug.js.eventBlockCount", 0);
+    context.setVariable("debug.js.promptTokenFound", false);
+    context.setVariable("debug.js.candidatesTokenFound", false);
+    context.setVariable("debug.js.jsonParseErrors", "");
+    context.setVariable("debug.js.topLevelError", "");
+    context.setVariable("debug.js.rawContentInvalid", false);
+    context.setVariable("debug.js.targetVariable", "response.content"); // 어떤 변수를 읽는지 명시
     context.setVariable("debug.js.rawContentLength", rawContent.length);
     try {
         var parsedAsJson = false;

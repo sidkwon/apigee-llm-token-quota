@@ -20,6 +20,7 @@
     <Policy>LC-LookupIdentityToken</Policy>
     <Policy>PC-PopulateIdentityToken</Policy>
     <Policy>JTP-ProtectPayload</Policy>
+    <Policy>JS-ExtractEventTokens</Policy>
   </Policies>
   <ProxyEndpoints>
     <ProxyEndpoint>default</ProxyEndpoint>
@@ -28,6 +29,7 @@
     <Resource>jsc://ExtractClaudeTokens.js</Resource>
     <Resource>jsc://SanitizeRequest.js</Resource>
     <Resource>jsc://SetTargetUrl.js</Resource>
+    <Resource>jsc://ExtractEventTokens.js</Resource>
   </Resources>
   <TargetEndpoints>
     <TargetEndpoint>default</TargetEndpoint>
