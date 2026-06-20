@@ -75,11 +75,13 @@ apigeecli apis deploy --wait --name llm-token-limits-v2 --ovr --rev "$REV" --org
 
 # Products and Apps
 echo "Creating AI Products..."
-apigeecli products create --name ai-product-bronze-v2 --display-name "AI Product Bronze v2" --envs "$APIGEE_ENV" --scopes "READ" --scopes "WRITE" --scopes "ACTION" --approval auto --llmopgrp ./aiproduct-bronze.json --org "$PROJECT" --token "$TOKEN" 2>/dev/null || echo "Product Bronze might already exist."
+apigeecli products create --name ai-product-bronze-v2 --display-name "AI Product Bronze v2" --envs "$APIGEE_ENV" --scopes "READ" --scopes "WRITE" --scopes "ACTION" --approval auto --llmopgrp ./aiproduct-bronze.json --org "$PROJECT" --token "$TOKEN" 2>/dev/null || \
+apigeecli products update --name ai-product-bronze-v2 --display-name "AI Product Bronze v2" --envs "$APIGEE_ENV" --scopes "READ" --scopes "WRITE" --scopes "ACTION" --approval auto --llmopgrp ./aiproduct-bronze.json --org "$PROJECT" --token "$TOKEN"
 # If create fails, maybe update? apigeecli doesn't have easy update-or-create, ignoring error for now as create handles existence check often or fails. 
 # Actually apigeecli usually fails if exists. 
 
-apigeecli products create --name ai-product-silver-v2 --display-name "AI Product Silver v2" --envs "$APIGEE_ENV" --scopes "READ" --scopes "WRITE" --scopes "ACTION" --approval auto --llmopgrp ./aiproduct-silver.json --org "$PROJECT" --token "$TOKEN" 2>/dev/null || echo "Product Silver might already exist."
+apigeecli products create --name ai-product-silver-v2 --display-name "AI Product Silver v2" --envs "$APIGEE_ENV" --scopes "READ" --scopes "WRITE" --scopes "ACTION" --approval auto --llmopgrp ./aiproduct-silver.json --org "$PROJECT" --token "$TOKEN" 2>/dev/null || \
+apigeecli products update --name ai-product-silver-v2 --display-name "AI Product Silver v2" --envs "$APIGEE_ENV" --scopes "READ" --scopes "WRITE" --scopes "ACTION" --approval auto --llmopgrp ./aiproduct-silver.json --org "$PROJECT" --token "$TOKEN"
 
 echo "Creating Developer..."
 apigeecli developers create --user testuser-v2 --email aidev-v2@cymbal.com --first Test --last Userv2 --org "$PROJECT" --token "$TOKEN" 2>/dev/null || echo "Developer might already exist."

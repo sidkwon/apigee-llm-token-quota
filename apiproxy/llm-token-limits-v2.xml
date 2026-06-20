@@ -6,21 +6,28 @@
   <LastModifiedAt>1768971948171</LastModifiedAt>
   <BasePaths>/v2/samples/llm-token-limits</BasePaths>
   <Policies>
-    <Policy>AM-ExtractTokenCount</Policy>
     <Policy>DC-CollectTokenCounts</Policy>
+    <Policy>EV-ExtractIdentityToken</Policy>
     <Policy>EV-ExtractRequest</Policy>
+    <Policy>EV-ExtractTokenInfo</Policy>
+    <Policy>JS-ExtractClaudeTokens</Policy>
+    <Policy>JS-SanitizeRequest</Policy>
+    <Policy>JS-SetTargetUrl</Policy>
     <Policy>LTQ-TokenCount</Policy>
     <Policy>LTQ-TokenEnforce</Policy>
+    <Policy>SC-ValidateAccessToken</Policy>
     <Policy>VA-VerifyAPIKey</Policy>
-    <Policy>JS-ExtractClaudeTokens</Policy>
-    <Policy>SC-CallClaudeAPI</Policy>
+    <Policy>LC-LookupIdentityToken</Policy>
+    <Policy>PC-PopulateIdentityToken</Policy>
+    <Policy>JTP-ProtectPayload</Policy>
   </Policies>
   <ProxyEndpoints>
     <ProxyEndpoint>default</ProxyEndpoint>
   </ProxyEndpoints>
   <Resources>
-    <Resource>properties://vertex_config.properties</Resource>
     <Resource>jsc://ExtractClaudeTokens.js</Resource>
+    <Resource>jsc://SanitizeRequest.js</Resource>
+    <Resource>jsc://SetTargetUrl.js</Resource>
   </Resources>
   <TargetEndpoints>
     <TargetEndpoint>default</TargetEndpoint>

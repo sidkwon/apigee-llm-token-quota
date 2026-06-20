@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PopulateCache continueOnError="false" enabled="true" name="PC-PopulateIdentityToken">
+  <DisplayName>PC-PopulateIdentityToken</DisplayName>
+  <CacheKey>
+    <KeyFragment ref="identity_token"/>
+  </CacheKey>
+  <Source>google.email</Source>
+  <ExpirySettings>
+    <TimeoutInSec>300</TimeoutInSec>
+  </ExpirySettings>
+</PopulateCache>

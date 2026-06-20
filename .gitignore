@@ -2,3 +2,10 @@ debug/
 .DS_Store
 *.log
 set-env.sh
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform.lock.hcl

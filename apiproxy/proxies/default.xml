@@ -21,10 +21,23 @@
         <Name>EV-ExtractIdentityToken</Name>
       </Step>
       <Step>
+        <Name>LC-LookupIdentityToken</Name>
+      </Step>
+      <Step>
         <Name>SC-ValidateAccessToken</Name>
+        <Condition>google.email = null</Condition>
       </Step>
       <Step>
         <Name>EV-ExtractTokenInfo</Name>
+        <Condition>google.email = null</Condition>
+      </Step>
+      <Step>
+        <Name>PC-PopulateIdentityToken</Name>
+        <Condition>lookupcache.LC-LookupIdentityToken.cachehit = false</Condition>
+      </Step>
+      <Step>
+        <Name>JTP-ProtectPayload</Name>
+        <Condition>request.verb = "POST"</Condition>
       </Step>
       <Step>
         <Name>EV-ExtractRequest</Name>
@@ -50,18 +63,7 @@
   </Flows>
   <PostFlow name="PostFlow">
     <Request/>
-    <Response>
-      <Step>
-        <Name>JS-ExtractClaudeTokens</Name>
-      </Step>
-      <Step>
-        <Name>LTQ-TokenCount</Name>
-        <Condition>(total_token_count != null) and (total_token_count &gt; 0)</Condition>
-      </Step>
-      <Step>
-        <Name>DC-CollectTokenCounts</Name>
-      </Step>
-    </Response>
+    <Response/>
   </PostFlow>
   <HTTPProxyConnection>
     <Properties/>

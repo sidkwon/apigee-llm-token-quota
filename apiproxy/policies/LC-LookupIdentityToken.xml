@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<LookupCache continueOnError="false" enabled="true" name="LC-LookupIdentityToken">
+  <DisplayName>LC-LookupIdentityToken</DisplayName>
+  <CacheKey>
+    <KeyFragment ref="identity_token"/>
+  </CacheKey>
+  <AssignTo>google.email</AssignTo>
+</LookupCache>

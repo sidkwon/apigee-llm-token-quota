@@ -33,6 +33,23 @@
         "interval": "5",
         "timeUnit": "minute"
       }
+    },
+    {
+      "apiSource": "llm-token-limits-v2",
+      "llmOperations": [
+        {
+          "resource": "/",
+          "methods": [
+            "POST"
+          ],
+          "model": "claude-opus-4-8"
+        }
+      ],
+      "llmTokenQuota": {
+        "limit": "5000",
+        "interval": "5",
+        "timeUnit": "minute"
+      }
     }
   ],
   "operationConfigType": "proxy"

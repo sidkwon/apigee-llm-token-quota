@@ -84,10 +84,16 @@ The user isolation is achieved through the `<Identifier>` element in the Quota p
 
 ## 📋 Prerequisites
 
-### Apigee Environment & Network
-Before deploying, ensure your Apigee environment is provisioned and accessible. This includes setting up the **Load Balancer**, **Private Service Connect (PSC)**, and **DNS** entries to route traffic to your Apigee Runtime.
+### Apigee Environment & Network (Provision via Terraform)
+Before deploying, the Apigee environment must be provisioned and accessible. We provide an automated Terraform configuration under the [`terraform/`](file:///usr/local/google/home/sinjoongk/Documents/sinjoonk/apigee-llm-token-quota/terraform) directory to set up:
+1. Apigee Organization (Non-VPC Peered, PAYG) and Instance.
+2. Apigee Environment, Env Group, and Attachments.
+3. KMS encryption keys for DB & Instance disks.
+4. Google-managed SSL Certificate & External HTTPS Load Balancer with Private Service Connect (PSC) NEG.
+5. Cloud DNS zone mapping records.
+6. Service accounts & IAM role assignments (`roles/iam.serviceAccountTokenCreator`, `roles/aiplatform.user`).
 
-*   Reference: [Apigee Provisioning - External Routing with PSC](https://docs.cloud.google.com/apigee/docs/api-platform/get-started/install-cli-non-peered?hl=en#external-routing-psc)
+To provision the infrastructure using Terraform, check the [**`terraform/README.md`**](file:///usr/local/google/home/sinjoongk/Documents/sinjoonk/apigee-llm-token-quota/terraform/README.md) file for step-by-step instructions.
 
 
 ### Service Account Permissions
@@ -101,9 +107,10 @@ gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
 
 ### Vertex AI Model Enablement
 To use Claude models, you must enable them in the **Vertex AI Model Garden**.
-Specifically, ensure the following models are enabled in your project (`YOUR_PROJECT_ID`):
-- **Claude 3.5 Sonnet** (or `sonnet-4-5` if available)
-- **Claude 3.5 Haiku** (or `haiku-4-5`)
+Specifically, ensure the following models are enabled in your Google Cloud project (`YOUR_PROJECT_ID`):
+- **Claude Opus 4.8** (or `claude-opus-4-8`)
+- **Claude Sonnet 4.6** (or `claude-sonnet-4-6`)
+- **Claude Haiku 4.5** (or `claude-haiku-4-5`)
 
 Visit [Vertex AI Model Garden](https://console.cloud.google.com/vertex-ai/model-garden) and search for "Claude" to enable them.
 
@@ -136,7 +143,19 @@ export APIGEE_HOST="YOUR_APIGEE_HOST"
 
 ## 🧪 Testing with Claude Code
 
-Ensure your `~/.claude/settings.json` is configured to use Vertex AI. The client will automatically send the Google Access Token.
+### 1. Authenticate with Google Cloud (Mandatory)
+Before launching Claude Code, you must authenticate your local environment using Application Default Credentials (ADC):
+
+```bash
+gcloud auth application-default login
+```
+
+**Why is this required?**
+* **Access Token Generation**: The `claude` CLI client uses local Google Application Default Credentials to dynamically generate a Google Access Token, which it passes in the `Authorization: Bearer <TOKEN>` header of every API request.
+* **User Identity Quota Isolation**: The Apigee proxy intercepts this token, validates it against Google OAuth2 token info service, extracts your user email, and uses it as the unique quota identifier (`google.email`). Without a valid ADC token, Apigee cannot authenticate your user identity and will reject the request.
+
+### 2. Configure Claude Code Settings
+Ensure your `~/.claude/settings.json` is configured to route calls via your Apigee proxy:
 
 ```json
 {
@@ -145,8 +164,9 @@ Ensure your `~/.claude/settings.json` is configured to use Vertex AI. The client
     "ANTHROPIC_VERTEX_PROJECT_ID": "YOUR_PROJECT_ID",
     "ANTHROPIC_VERTEX_BASE_URL": "https://YOUR_APIGEE_HOST/v2/samples/llm-token-limits/v1",
     "ANTHROPIC_CUSTOM_HEADERS": "x-apikey: YOUR_API_KEY",
-    "ANTHROPIC_MODEL": "claude-sonnet-4-6",
-    "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5"
+    "ANTHROPIC_MODEL": "claude-sonnet-4-6",          // Can also be set to "claude-opus-4-8"
+    "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5",
+    "CLOUD_ML_REGION": "global"                      // Routes via regional dynamic routing in Apigee
   }
 }
 ```

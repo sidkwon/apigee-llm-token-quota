@@ -24,7 +24,7 @@ APIGEE_HOST=${APIGEE_HOST:-"YOUR_APIGEE_HOST"}
 # Fetch Bronze Key dynamically if not set
 if [ -z "$API_KEY" ]; then
   echo "Fetching Bronze API Key..."
-  API_KEY=$(apigeecli apps get --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN" --disable-check 2>/dev/null | python3 -c "import json, sys; data=json.load(sys.stdin); print(next((c.get('consumerKey') for app in data for c in app.get('credentials', []) if any(p.get('apiproduct', '') == 'ai-product-bronze-v2' for p in c.get('apiProducts', []))), ''))")
+  API_KEY=$("$HOME/.apigeecli/bin/apigeecli" apps get --name ai-consumer-app-v2 --org "$PROJECT" --token "$TOKEN" --disable-check 2>/dev/null | python3 -c "import json, sys; data=json.load(sys.stdin); apps = data if isinstance(data, list) else [data]; print(next((c.get('consumerKey') for app in apps for c in app.get('credentials', []) if any(p.get('apiproduct', '') == 'ai-product-bronze-v2' for p in c.get('apiProducts', []))), ''))" 2>/dev/null)
 
 fi
 

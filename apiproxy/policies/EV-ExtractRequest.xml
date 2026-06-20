@@ -14,7 +14,7 @@
 <ExtractVariables name="EV-ExtractRequest">
   <DisplayName>EV-ExtractRequest</DisplayName>
   <Variable name="proxy.pathsuffix">
-    <Pattern ignoreCase="true">/v1/projects/{extracted_project}/locations/{extracted_location}/publishers/anthropic/models/{model}:streamRawPredict</Pattern>
+    <Pattern ignoreCase="true">/v1/projects/{extracted_project}/locations/{extracted_location}/publishers/anthropic/models/{model}:{prediction_type}</Pattern>
   </Variable>
   <JSONPayload>
     <Variable name="claude_messages">
