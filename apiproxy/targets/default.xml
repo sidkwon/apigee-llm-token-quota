@@ -5,6 +5,9 @@
       <Step>
         <Name>JS-SetTargetUrl</Name>
       </Step>
+      <Step>
+        <Name>JS-AddBillingLabels</Name>
+      </Step>
     </Request>
     <Response/>
   </PreFlow>
@@ -47,12 +50,5 @@
       <Property name="connect.timeout.millis">60000</Property>
       <Property name="io.timeout.millis">300000</Property>
     </Properties>
-    <Authentication>
-      <GoogleAccessToken>
-        <Scopes>
-          <Scope>https://www.googleapis.com/auth/cloud-platform</Scope>
-        </Scopes>
-      </GoogleAccessToken>
-    </Authentication>
   </HTTPTargetConnection>
 </TargetEndpoint>

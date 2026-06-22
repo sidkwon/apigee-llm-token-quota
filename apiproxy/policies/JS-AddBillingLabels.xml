@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Javascript name="JS-AddBillingLabels" timeLimit="200">
+  <DisplayName>JS-AddBillingLabels</DisplayName>
+  <ResourceURL>jsc://AddBillingLabels.js</ResourceURL>
+</Javascript>
