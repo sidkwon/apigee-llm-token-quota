@@ -15,7 +15,7 @@
 
 3.  **보안 인증 (Secure Authentication)**:
     *   `oauth2.googleapis.com/tokeninfo`를 통해 Google 액세스 토큰을 검증합니다.
-    *   클라이언트 측에 API 키를 노출하지 않도록 Apigee 서비스 계정(`apigee-demo`)을 통해 Vertex AI를 안전하게 호출합니다.
+    *   클라이언트의 Google 액세스 토큰(사용자 인증 정보)을 Vertex AI로 직접 전달(Pass-through)하여 호출하며, 이를 통해 GCP 레벨에서의 개별 감사 및 동적 빌링 레이블 지정을 지원합니다.
 
 4.  **보안 및 성능 강화 (Security & Performance Hardening)**:
     *   **OAuth 토큰 캐싱**: 토큰 검증 결과를 300초 동안 캐싱하여 외부 API 호출 지연(Latency)을 단축하고 Google API 호출 속도 제한(Rate limits) 초과를 방지합니다.
@@ -74,14 +74,18 @@ graph TD
 사용자 격리는 Quota 정책의 `<Identifier>` 요소를 통해 구현됩니다:
 
 ```xml
-<LLMTokenQuota name="LTQ-TokenEnforce">
-    <!-- API 제품 설정에서 정의된 한도를 공유합니다 -->
-    <Allow count="1000" countRef="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.limit"/>
+<LLMTokenQuota name="LTQ-TokenEnforce" type="calendar">
+    <!-- 기본 제한량은 10000이며, API Product 설정에 값이 지정되어 있을 경우 동적으로 재정의됩니다 -->
+    <Allow count="10000" countRef="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.limit"/>
+    <Interval ref="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.interval">1</Interval>
+    <TimeUnit ref="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.timeunit">minute</TimeUnit>
     
-    <!-- 카운터는 이메일별로 고유하게 관리됩니다 -->
+    <!-- 사용자 이메일별 고유 카운터 식별자 -->
     <Identifier ref="google.email"/>
-    
+    <StartTime>2013-08-21 10:00:00</StartTime>
+    <LLMModelSource>{model}</LLMModelSource>
     <EnforceOnly>true</EnforceOnly>
+    <SharedName>common-counter</SharedName>
 </LLMTokenQuota>
 ```
 
@@ -160,6 +164,7 @@ gcloud auth application-default login
 **이 작업이 왜 필요한가요?**
 *   **액세스 토큰 생성**: `claude` CLI 클라이언트는 로컬의 Google Application Default Credentials를 활용해 Google 액세스 토큰을 동적으로 생성하고, 매 API 요청마다 `Authorization: Bearer <TOKEN>` 헤더에 실어 전송합니다.
 *   **사용자 신원 기반 쿼타 격리**: Apigee 프록시는 이 토큰을 가로채 Google OAuth2 토큰 정보 서비스를 통해 검증하고 사용자의 이메일을 추출하여 고유 쿼타 식별자(`google.email`)로 활용합니다. 유효한 ADC 토큰이 없으면 Apigee가 사용자 신원을 검증할 수 없어 요청이 거부됩니다.
+*   **타겟 권한 전달 (Pass-through)**: 프록시는 이 토큰을 Vertex AI로 그대로 전달합니다. 로컬 인증에 사용하는 Google 계정이 GCP 프로젝트 내에서 **Vertex AI 사용자**(`roles/aiplatform.user`) 역할을 가지고 있어야 하며, 그렇지 않을 경우 API 호출 시 403 Forbidden 오류가 발생합니다.
 
 ### 2. Claude Code 설정 구성
 `~/.claude/settings.json` 파일이 Apigee 프록시를 통해 요청을 라우팅하도록 설정되어 있는지 확인합니다:

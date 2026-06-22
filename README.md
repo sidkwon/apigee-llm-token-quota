@@ -15,7 +15,7 @@ This proxy demonstrates how to implement **User-Based LLM Token Quota** enforcem
 
 3.  **Secure Authentication**:
     *   Validates Google Access Tokens via `oauth2.googleapis.com/tokeninfo`.
-    *   Uses Apigee Service Account (`apigee-demo`) to securely invoke Vertex AI, removing the need for client-side keys.
+    *   Passes through the client's Google Access Token (user credentials) to Vertex AI, enabling GCP-level auditing and dynamic billing labels.
 
 4.  **Security & Performance Hardening**:
     *   **OAuth Token Caching**: Caches token validation mappings for 300 seconds to minimize external API call latency and prevent hitting Google API rate limits.
@@ -74,14 +74,18 @@ graph TD
 The user isolation is achieved through the `<Identifier>` element in the Quota policies:
 
 ```xml
-<LLMTokenQuota name="LTQ-TokenEnforce">
-    <!-- Limit is shared from API Product settings -->
-    <Allow count="1000" countRef="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.limit"/>
+<LLMTokenQuota name="LTQ-TokenEnforce" type="calendar">
+    <!-- Default count is 10000, but dynamically overridden by API Product configuration if present -->
+    <Allow count="10000" countRef="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.limit"/>
+    <Interval ref="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.interval">1</Interval>
+    <TimeUnit ref="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.timeunit">minute</TimeUnit>
     
-    <!-- BUT the counter is unique per Email -->
+    <!-- Unique counter identifier per user email -->
     <Identifier ref="google.email"/>
-    
+    <StartTime>2013-08-21 10:00:00</StartTime>
+    <LLMModelSource>{model}</LLMModelSource>
     <EnforceOnly>true</EnforceOnly>
+    <SharedName>common-counter</SharedName>
 </LLMTokenQuota>
 ```
 
@@ -160,6 +164,7 @@ gcloud auth application-default login
 **Why is this required?**
 * **Access Token Generation**: The `claude` CLI client uses local Google Application Default Credentials to dynamically generate a Google Access Token, which it passes in the `Authorization: Bearer <TOKEN>` header of every API request.
 * **User Identity Quota Isolation**: The Apigee proxy intercepts this token, validates it against Google OAuth2 token info service, extracts your user email, and uses it as the unique quota identifier (`google.email`). Without a valid ADC token, Apigee cannot authenticate your user identity and will reject the request.
+* **Target Authorization (Pass-through)**: The proxy forwards this token directly to Vertex AI. Ensure your Google account has the **Vertex AI User** (`roles/aiplatform.user`) role in the GCP project, or the API call will return a 403 Forbidden error.
 
 ### 2. Configure Claude Code Settings
 Ensure your `~/.claude/settings.json` is configured to route calls via your Apigee proxy:
