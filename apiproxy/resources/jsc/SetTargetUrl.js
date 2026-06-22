@@ -34,4 +34,7 @@ if (locationsIndex !== -1 && locationsIndex + 1 < segments.length) {
   
   // Prevent Apigee from appending the path suffix automatically
   context.setVariable("target.copy.pathsuffix", false);
+  
+  // Strip Accept-Encoding header from the request to backend to prevent ZlibError in clients
+  context.removeVariable("request.header.accept-encoding");
 }

@@ -22,6 +22,7 @@ This proxy demonstrates how to implement **User-Based LLM Token Quota** enforcem
     *   **SSRF Protection**: Performs strict regex validation on dynamic regional target locations to prevent host header injection.
     *   **JSON Threat Protection**: Enforces structural payload constraints (depth, array/string sizes) to block Denial-of-Service (DoS) attacks.
     *   **Streaming (SSE) Support**: Supports Server-Sent Events (SSE) responses via Apigee `EventFlow` response chunk processing, correctly tracking cumulative token usage for clients like `claude-code` that utilize streaming.
+    *   **Decompression Error Prevention**: Strips the client's `Accept-Encoding` header when forwarding requests to Vertex AI, preventing client-side `ZlibError` or decompression mismatches during streaming responses.
 
 ## 🏗️ Architecture Flow
 
