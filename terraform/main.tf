@@ -147,3 +147,10 @@ resource "google_project_iam_member" "apigee_sa_vertex_user" {
   member  = "serviceAccount:${google_service_account.apigee_demo.email}"
 }
 
+# Grant Logging Log Writer role to the Apigee Demo Service Account
+resource "google_project_iam_member" "apigee_sa_logging_writer" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.apigee_demo.email}"
+}
+

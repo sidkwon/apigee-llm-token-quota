@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MessageLogging continueOnError="true" enabled="true" name="ML-LogTokenUsage">
+  <DisplayName>ML-LogTokenUsage</DisplayName>
+  <CloudLogging>
+    <LogName>projects/{organization.name}/logs/apigee-llm-token-quota</LogName>
+    <Message contentType="application/json">
+{
+  "developer_email": "{developer.email}",
+  "user_email": "{google.email}",
+  "api_product": "{apiproduct.name}",
+  "model": "{model}",
+  "prompt_tokens": {prompt_token_count},
+  "candidates_tokens": {candidates_token_count},
+  "total_tokens": {total_token_count}
+}
+    </Message>
+  </CloudLogging>
+</MessageLogging>
