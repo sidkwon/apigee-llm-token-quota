@@ -51,17 +51,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesFilter": {
-                  "filter": "metric.type=\"logging.googleapis.com/user/apigee_llm_total_tokens\"",
-                  "aggregation": {
-                    "alignmentPeriod": "60s",
-                    "perSeriesAligner": "ALIGN_SUM",
-                    "crossSeriesReducer": "REDUCE_SUM",
-                    "groupByFields": [
-                      "metric.label.user_email"
-                    ]
-                  }
-                }
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align() | group_by [metric.label.user_email], sum(val())"
               },
               "plotType": "STACKED_BAR"
             }
@@ -79,17 +69,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesFilter": {
-                  "filter": "metric.type=\"logging.googleapis.com/user/apigee_llm_total_tokens\"",
-                  "aggregation": {
-                    "alignmentPeriod": "60s",
-                    "perSeriesAligner": "ALIGN_SUM",
-                    "crossSeriesReducer": "REDUCE_SUM",
-                    "groupByFields": [
-                      "metric.label.model"
-                    ]
-                  }
-                }
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align() | group_by [metric.label.model], sum(val())"
               },
               "plotType": "LINE"
             }
@@ -102,17 +82,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesFilter": {
-                  "filter": "metric.type=\"logging.googleapis.com/user/apigee_llm_total_tokens\"",
-                  "aggregation": {
-                    "alignmentPeriod": "60s",
-                    "perSeriesAligner": "ALIGN_SUM",
-                    "crossSeriesReducer": "REDUCE_SUM",
-                    "groupByFields": [
-                      "metric.label.api_product"
-                    ]
-                  }
-                }
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align() | group_by [metric.label.api_product], sum(val())"
               },
               "plotType": "STACKED_AREA"
             }
