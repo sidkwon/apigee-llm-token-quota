@@ -96,14 +96,25 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
         }
       },
       {
-        "title": "Request Count by Response Code & User",
+        "title": "Request Count by Response Code",
         "xyChart": {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | filter has_value(metric.response_code) | count_from | group_by [response_code: metric.response_code], sum(val())"
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"logging.googleapis.com/user/apigee_llm_total_tokens\" AND metric.label.response_code=monitoring.regex.full_match(\"[0-9]+\")",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_COUNT",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": [
+                      "metric.label.response_code"
+                    ]
+                  }
+                }
               },
-              "plotType": "STACKED_BAR"
+              "plotType": "STACKED_BAR",
+              "legendTemplate": "$${metric.label.response_code}"
             }
           ]
         }
