@@ -22,7 +22,7 @@ resource "google_logging_metric" "apigee_llm_total_tokens" {
     }
     labels {
       key         = "response_code"
-      value_type  = "INT64"
+      value_type  = "STRING"
       description = "HTTP Response Status Code"
     }
   }
