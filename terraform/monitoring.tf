@@ -162,17 +162,19 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "columnSettings": [
             {
               "column": "user_email",
-              "visible": true
+              "visible": true,
+              "displayName": "User Email"
             },
             {
               "column": "value",
-              "visible": true
+              "visible": true,
+              "displayName": "Total Tokens"
             }
           ],
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [user_email: metric.user_email], sum(val()) | top 10"
+                "prometheusQuery": "topk(10, sum(sum_over_time(logging_googleapis_com:user_apigee_llm_total_tokens_sum{monitored_resource=\"global\"}[$${__interval}])) by (user_email))"
               }
             }
           ]
