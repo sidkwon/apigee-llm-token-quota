@@ -152,6 +152,36 @@ export APIGEE_HOST="YOUR_APIGEE_HOST"
 ./test-quota.sh 20
 ```
 
+## 📊 GCP Logging & 대시보드 모니터링
+
+Apigee 프록시는 요청이 처리될 때마다(성공 요청 및 429 쿼타 초과 실패 요청 모두 포함) `PostClientFlow` 단에서 `apigee-llm-token-quota` 라는 로그 이름으로 구글 클라우드 로깅(Cloud Logging)에 상세 JSON 로그를 전송합니다.
+
+수집된 로그들은 로그 기반 메트릭으로 자동 변환되며, Terraform으로 함께 배포되는 전용 GCP Monitoring Dashboard 상에 시각화됩니다.
+
+### 📈 제공되는 차트:
+1.  **사용자별 LLM 토큰 사용량 트렌드 (합계)**: 누적 토큰 소비 현황을 사용자 이메일(`user_email`) 기준으로 분류하여 적층 막대(Stacked Bar) 형태로 시각화합니다.
+2.  **Claude 모델별 토큰 소비량**: Claude 모델 종류(`model`, 예: `claude-sonnet-4-6`, `claude-haiku-4-5`)에 따른 실시간 토큰 사용 현황을 라인 차트로 보여줍니다.
+3.  **Apigee API 제품별 토큰 소비량**: API 제품 등급(`api_product`, 예: `bronze`, `silver` 등) 기준 누적 사용 트렌드를 적층 영역(Stacked Area) 차트로 보여줍니다.
+4.  **응답 코드별 요청 수**: API 요청 성공(`200`) 및 쿼타 제한 초과(`429`) 등의 HTTP 상태 코드 빈도를 분류하여 시각화합니다. 차트의 시간 축 해상도 조절에 맞춰 툴팁에는 항상 단일 카운트 건수(Count)만 깔끔하게 노출됩니다.
+
+---
+
+## 🏷️ GCP Billing 레이블 연동 (Vertex AI 비용 추적)
+
+조직 내 비용 센터별 부서 청구 또는 사용자별 실질 비용 구분을 지원하기 위해, 프록시는 Vertex AI로 향하는 모든 API 요청에 커스텀 비용 추적 레이블을 헤더에 삽입합니다.
+
+*   **HTTP 헤더 키**: `X-Vertex-AI-Labels`
+*   **라벨 구조 및 포맷**: 아래 구조의 JSON 데이터를 **Base64로 인코딩**하여 전달합니다.
+    ```json
+    {
+      "claude_requester": "정제된_사용자_이메일"
+    }
+    ```
+*   **값 정제 규칙(Sanitization)**: 사용자 이메일 값은 소문자로 변환되고 특수 기호는 언더바(`_`)로 치환되며, GCP 레이블 제약 조건에 맞춰 최대 63글자 이내로 정제됩니다 (예: `user@domain.com` ➡️ `user_domain_com`).
+*   **빌링 보고서 반영 지연 주의**: 새롭게 주입된 레이블 데이터는 구글 클라우드 빌링(GCP Billing) 파이프라인의 배치 처리 특성상, 실제 호출 후 **약 24시간에서 48시간이 지난 후에** GCP Billing Console 보고서의 필터 선택란(`Labels` -> `Select a key`)에 조회가 가능해집니다.
+
+---
+
 ## 🧪 Claude Code 연동 테스트
 
 ### 1. Google Cloud 인증 (필수)

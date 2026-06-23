@@ -151,7 +151,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
                 }
               },
               "plotType": "STACKED_BAR",
-              "legendTemplate": "$${metric.label.response_code}"
+              "legendTemplate": "$${metric.labels.response_code}"
             }
           ]
         }

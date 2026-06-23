@@ -152,6 +152,36 @@ export APIGEE_HOST="YOUR_APIGEE_HOST"
 ./test-quota.sh 20
 ```
 
+## 📊 GCP Logging & Monitoring Dashboard
+
+The Apigee proxy automatically outputs detailed JSON logs to Google Cloud Logging under the log name `apigee-llm-token-quota` for every request processed (both successful and failed, including 429 quota exceed responses) inside the `PostClientFlow`.
+
+These logs are compiled into metrics and displayed on a unified GCP Monitoring Dashboard provisioned automatically via Terraform:
+
+### 📈 Dashboard Charts:
+1.  **LLM Token Usage Trend by User (Total)**: Stacked bar chart showing total cumulative token consumption grouped by `user_email` to help visualize usage distribution.
+2.  **Token Consumption by Claude Model**: Line chart demonstrating token usage trends separated by Claude model versions (e.g. `claude-sonnet-4-6`, `claude-haiku-4-5`).
+3.  **Token Consumption by Apigee API Product**: Stacked area chart showing total tokens consumed per Apigee API Product tier (`bronze`, `silver`, etc.).
+4.  **Request Count by Response Code**: Stacked bar chart visualizing the frequency of HTTP response status codes (e.g. `200` OK, `429` Quota Exceeded) mapped to help monitor error rates. Tooltips show clean, single-count aggregates via automatic dynamic alignment period adjustment.
+
+---
+
+## 🏷️ GCP Billing Labels (Vertex AI)
+
+To support organizational cost-center tracking directly within the Google Cloud Billing console, the proxy automatically attaches custom tracking labels to all outgoing Vertex AI requests.
+
+*   **HTTP Header**: `X-Vertex-AI-Labels`
+*   **Format**: Base64-encoded JSON payload containing:
+    ```json
+    {
+      "claude_requester": "sanitized_user_email"
+    }
+    ```
+*   **Sanitization**: User emails are automatically converted to lowercase, with special characters replaced by underscores, and truncated to 63 characters to meet GCP billing constraints (e.g., `user@domain.com` becomes `user_domain_com`).
+*   **Billing Reports Latency**: Please note that new custom labels can take **24 to 48 hours** to propagate and appear as filter options under the "Labels" section in the Google Cloud Billing Console Reports due to asynchronous billing pipeline processing.
+
+---
+
 ## 🧪 Testing with Claude Code
 
 ### 1. Authenticate with Google Cloud (Mandatory)

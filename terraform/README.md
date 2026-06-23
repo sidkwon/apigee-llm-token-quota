@@ -13,13 +13,14 @@ All resources are split into specialized files following Terraform best practice
 *   [`main.tf`](file:///usr/local/google/home/sinjoongk/Documents/sinjoonk/apigee-llm-token-quota/terraform/main.tf): Provisions core services (APIs), KMS keys (for database encryption and instance disk encryption), service agent bindings, Apigee Organization, Instance, Environment, and Environment Group.
 *   [`routing.tf`](file:///usr/local/google/home/sinjoongk/Documents/sinjoonk/apigee-llm-token-quota/terraform/routing.tf): Provisions VPC and Subnetwork, regional PSC network endpoint group (NEG), Global IP Address, Google-managed SSL Certificate, Global HTTPS Load Balancer (Backend service, URL Map, Target HTTPS Proxy, Forwarding Rule), and Cloud DNS A record.
 *   [`outputs.tf`](file:///usr/local/google/home/sinjoongk/Documents/sinjoonk/apigee-llm-token-quota/terraform/outputs.tf): Exposes essential outputs such as the external IP address of the load balancer and the runtime instance service attachment.
+*   [`monitoring.tf`](file:///usr/local/google/home/sinjoongk/Documents/sinjoonk/apigee-llm-token-quota/terraform/monitoring.tf): Provisions GCP log-based metrics (`apigee_llm_total_tokens` for token tracking, `apigee_llm_request_count` for request frequency) and a Cloud Monitoring Dashboard to visualize LLM usage metrics.
 
 ---
 
 ## Detailed Resource Map
 
 ### 1. APIs & IAM Settings (`main.tf`)
-- **APIs enabled**: `apigee.googleapis.com`, `apihub.googleapis.com`, `compute.googleapis.com`, `cloudkms.googleapis.com`.
+- **APIs enabled**: `apigee.googleapis.com`, `apihub.googleapis.com`, `compute.googleapis.com`, `cloudkms.googleapis.com`, `logging.googleapis.com`, `monitoring.googleapis.com`.
 - **Apigee Service Agent (`google_project_service_identity`)**: Automatically retrieves the Apigee-managed service account identity.
 - **KMS Keys**:
   - `apigee-org-key-ring` & `apigee-org-key`: Customer-Managed Encryption Key (CMEK) used to encrypt the runtime organization database.
@@ -29,6 +30,7 @@ All resources are split into specialized files following Terraform best practice
   - Creates the `apigee-demo` service account.
   - Grants the Apigee service identity `roles/iam.serviceAccountUser` and `roles/iam.serviceAccountTokenCreator` permissions on the service account (allowing Apigee proxies to impersonate it and generate OAuth/ID tokens).
   - Grants the service account `roles/aiplatform.user` permissions on the project to allow successful calls to Vertex AI Gemini/Claude API endpoints.
+  - Grants the service account `roles/logging.logWriter` permissions to write custom JSON payloads to Google Cloud Logging.
 
 ### 2. Apigee Entities (`main.tf`)
 - **Apigee Organization (`google_apigee_organization`)**: Created with `runtime_type = "CLOUD"`, `billing_type = "PAYG"`, and `disable_vpc_peering = true`.
@@ -48,6 +50,17 @@ All resources are split into specialized files following Terraform best practice
   - Managed SSL Cert (`google_compute_managed_ssl_certificate`) automatically provisioning SSL for the hostname `apigee.annakie.xyz` (named `apigee-cert-v2`, using `create_before_destroy = true` lifecycle rule to prevent resource in use lockups).
   - Target HTTPS Proxy (`google_compute_target_https_proxy`) and Global Forwarding Rule mapping port 443 to the target proxy.
 - **Cloud DNS Record (`google_dns_record_set`)**: Automatically registers an `A` record mapping `apigee.annakie.xyz` to the reserved Global IP inside the DNS zone project (`dm-project-391900`).
+
+### 4. GCP Logging & Monitoring (`monitoring.tf`)
+- **Log-Based Metrics**:
+  - `apigee_llm_total_tokens`: A `DISTRIBUTION` metric that extracts the value of `jsonPayload.total_tokens` from JSON payloads printed to `apigee-llm-token-quota` log. It groups time series data by `user_email`, `model`, `api_product`, and `response_code`.
+  - `apigee_llm_request_count`: A `DELTA` `INT64` counter metric that increments for each log entry. It has label extractors for `user_email`, `model`, `api_product`, and `response_code` (as a `STRING`).
+- **Monitoring Dashboard (`google_monitoring_dashboard`)**:
+  - Provisions a Google Cloud Monitoring Dashboard named `"Apigee LLM Quota & Token Usage Dashboard"` with a 2-column grid layout.
+  - **Chart 1: LLM Token Usage Trend by User (Total)**: Stacked bar chart showing total accumulated tokens consumed grouped by `user_email`.
+  - **Chart 2: Token Consumption by Claude Model**: Line chart visualizing token usage broken down by Claude models (e.g. `claude-sonnet-4-6`).
+  - **Chart 3: Token Consumption by Apigee API Product**: Stacked area chart showing total token usage by API products (`bronze`, `silver`, etc.).
+  - **Chart 4: Request Count by Response Code**: Stacked bar chart demonstrating request frequency grouped by HTTP response status codes (e.g. `200`, `429`). It automatically filters out empty/null codes and displays clean count values in tooltips using dynamic alignment period adjustments.
 
 ---
 
