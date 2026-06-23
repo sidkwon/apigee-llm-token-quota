@@ -13,3 +13,7 @@ set-env.sh
 # Troubleshooting
 troubleshooting.md
 troubleshooting_KO.md
+
+# Agents Customizations
+.agents/
+

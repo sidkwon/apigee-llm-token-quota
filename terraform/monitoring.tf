@@ -53,7 +53,8 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
               "timeSeriesQuery": {
                 "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [metric.user_email], sum(val())"
               },
-              "plotType": "STACKED_BAR"
+              "plotType": "STACKED_BAR",
+              "legendTemplate": "$${metric.label.user_email}"
             }
           ],
           "timeshiftDuration": "0s",
@@ -71,7 +72,8 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
               "timeSeriesQuery": {
                 "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [metric.model], sum(val())"
               },
-              "plotType": "LINE"
+              "plotType": "LINE",
+              "legendTemplate": "$${metric.label.model}"
             }
           ]
         }
@@ -84,7 +86,8 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
               "timeSeriesQuery": {
                 "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [metric.api_product], sum(val())"
               },
-              "plotType": "STACKED_AREA"
+              "plotType": "STACKED_AREA",
+              "legendTemplate": "$${metric.label.api_product}"
             }
           ]
         }
