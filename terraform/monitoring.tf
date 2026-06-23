@@ -174,7 +174,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "prometheusQuery": "topk(10, sum(sum_over_time(logging_googleapis_com:user_apigee_llm_total_tokens_sum{monitored_resource=\"global\"}[$${__interval}])) by (user_email))"
+                "prometheusQuery": "topk(10, sum(sum_over_time(logging_googleapis_com:user_apigee_llm_total_tokens_sum{monitored_resource=\"global\"}[$${__range}])) by (user_email))"
               }
             }
           ]
