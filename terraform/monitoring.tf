@@ -51,10 +51,9 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [metric.user_email], sum(val())"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [user_email: metric.user_email], sum(val())"
               },
-              "plotType": "STACKED_BAR",
-              "legendTemplate": "$${metric.label.user_email}"
+              "plotType": "STACKED_BAR"
             }
           ],
           "timeshiftDuration": "0s",
@@ -70,10 +69,9 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [metric.model], sum(val())"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [model: metric.model], sum(val())"
               },
-              "plotType": "LINE",
-              "legendTemplate": "$${metric.label.model}"
+              "plotType": "LINE"
             }
           ]
         }
@@ -84,10 +82,9 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [metric.api_product], sum(val())"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [api_product: metric.api_product], sum(val())"
               },
-              "plotType": "STACKED_AREA",
-              "legendTemplate": "$${metric.label.api_product}"
+              "plotType": "STACKED_AREA"
             }
           ]
         }
