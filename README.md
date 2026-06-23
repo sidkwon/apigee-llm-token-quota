@@ -163,6 +163,7 @@ These logs are compiled into metrics and displayed on a unified GCP Monitoring D
 2.  **Token Consumption by Claude Model**: Line chart demonstrating token usage trends separated by Claude model versions (e.g. `claude-sonnet-4-6`, `claude-haiku-4-5`).
 3.  **Token Consumption by Apigee API Product**: Stacked area chart showing total tokens consumed per Apigee API Product tier (`bronze`, `silver`, etc.).
 4.  **Request Count by Response Code**: Stacked bar chart visualizing the frequency of HTTP response status codes (e.g. `200` OK, `429` Quota Exceeded) mapped to help monitor error rates. Tooltips show clean, single-count aggregates via automatic dynamic alignment period adjustment.
+5.  **Top 10 Token Consuming Users**: Time Series Table widget showing a list of the top 10 user email addresses (`user_email`) who have consumed the largest amount of tokens, along with their precise total token usage numbers.
 
 ---
 

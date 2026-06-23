@@ -61,6 +61,7 @@ All resources are split into specialized files following Terraform best practice
   - **Chart 2: Token Consumption by Claude Model**: Line chart visualizing token usage broken down by Claude models (e.g. `claude-sonnet-4-6`).
   - **Chart 3: Token Consumption by Apigee API Product**: Stacked area chart showing total token usage by API products (`bronze`, `silver`, etc.).
   - **Chart 4: Request Count by Response Code**: Stacked bar chart demonstrating request frequency grouped by HTTP response status codes (e.g. `200`, `429`). It automatically filters out empty/null codes and displays clean count values in tooltips using dynamic alignment period adjustments.
+  - **Widget 5: Top 10 Token Consuming Users**: A Time Series Table listing the top 10 email addresses (`user_email`) consuming the highest number of tokens, along with their actual consumed token count sums.
 
 ---
 
