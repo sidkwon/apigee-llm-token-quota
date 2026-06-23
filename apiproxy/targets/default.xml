@@ -51,6 +51,7 @@
     <Properties>
       <Property name="connect.timeout.millis">60000</Property>
       <Property name="io.timeout.millis">300000</Property>
+      <Property name="success.codes">2xx, 3xx, 4xx</Property>
     </Properties>
   </HTTPTargetConnection>
 </TargetEndpoint>
