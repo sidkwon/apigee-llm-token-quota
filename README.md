@@ -107,12 +107,32 @@ Before deploying, the Apigee environment must be provisioned and accessible. We 
 To provision the infrastructure using Terraform, check the [**`terraform/README.md`**](file:///usr/local/google/home/sinjoongk/Documents/sinjoonk/apigee-llm-token-quota/terraform/README.md) file for step-by-step instructions.
 
 
-### Service Account Permissions
-The Service Account used by the Proxy (`apigee-demo`) must have the **Vertex AI User** role (`roles/aiplatform.user`) to invoke the Gemini/Claude API.
+### IAM Permissions Configuration
+
+#### 1. Proxy Service Account Permissions
+The Service Account used by the Proxy (`apigee-demo`) must have the **Agent Platform User** (formerly Vertex AI User) role (`roles/aiplatform.user`) to invoke the Gemini/Claude API.
 
 ```bash
 gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
   --member="serviceAccount:YOUR_SERVICE_ACCOUNT" \
+  --role="roles/aiplatform.user"
+```
+
+#### 2. Test User Account Permissions (For Claude Code & Test Clients)
+To perform testing successfully, the **actual Google User Account** executing the tests must also be granted the following IAM roles:
+
+*   **Agent Platform User** (`roles/aiplatform.user`): Required to invoke Claude models via proxy.
+*   **Apigee Read-only Admin** (`roles/apigee.readOnlyAdmin`): Required to retrieve app credentials/API keys dynamically (e.g. inside `./test-quota.sh`). Note that the default `Apigee API Reader` role is insufficient as it does not allow reading app keys.
+
+```bash
+# Bind Apigee Read-only Admin role to retrieve keys
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="user:user@domain.com" \
+  --role="roles/apigee.readOnlyAdmin"
+
+# Bind Agent Platform User role to call Claude
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="user:user@domain.com" \
   --role="roles/aiplatform.user"
 ```
 
@@ -193,9 +213,9 @@ gcloud auth application-default login
 ```
 
 **Why is this required?**
-* **Access Token Generation**: The `claude` CLI client uses local Google Application Default Credentials to dynamically generate a Google Access Token, which it passes in the `Authorization: Bearer <TOKEN>` header of every API request.
-* **User Identity Quota Isolation**: The Apigee proxy intercepts this token, validates it against Google OAuth2 token info service, extracts your user email, and uses it as the unique quota identifier (`google.email`). Without a valid ADC token, Apigee cannot authenticate your user identity and will reject the request.
-* **Target Authorization (Pass-through)**: The proxy forwards this token directly to Vertex AI. Ensure your Google account has the **Vertex AI User** (`roles/aiplatform.user`) role in the GCP project, or the API call will return a 403 Forbidden error.
+*   **Access Token Generation**: The `claude` CLI client uses local Google Application Default Credentials to dynamically generate a Google Access Token, which it passes in the `Authorization: Bearer <TOKEN>` header of every API request.
+*   **User Identity Quota Isolation**: The Apigee proxy intercepts this token, validates it against Google OAuth2 token info service, extracts your user email, and uses it as the unique quota identifier (`google.email`). Without a valid ADC token, Apigee cannot authenticate your user identity and will reject the request.
+*   **Target Authorization (Pass-through)**: The proxy forwards this token directly to Vertex AI. Ensure your Google account has the **Agent Platform User** (formerly Vertex AI User) role (`roles/aiplatform.user`) in the GCP project, or the API call will return a 403 Forbidden error.
 
 ### 2. Configure Claude Code Settings
 Ensure your `~/.claude/settings.json` is configured to route calls via your Apigee proxy:

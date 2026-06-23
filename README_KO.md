@@ -107,12 +107,32 @@ graph TD
 Terraform을 사용해 인프라를 구축하려면 [**`terraform/README.md`**](file:///usr/local/google/home/sinjoongk/Documents/sinjoonk/apigee-llm-token-quota/terraform/README.md) 파일의 단계별 안내를 참조해 주세요.
 
 
-### 서비스 계정 권한
-프록시에서 사용하는 서비스 계정(`apigee-demo`)은 Gemini/Claude API를 호출하기 위해 **Vertex AI 사용자** 역할(`roles/aiplatform.user`)을 가지고 있어야 합니다.
+### IAM 권한 설정
+
+#### 1. 프록시 서비스 계정 권한
+프록시에서 사용하는 서비스 계정(`apigee-demo`)은 Gemini/Claude API를 호출하기 위해 **Agent Platform 사용자 (Agent Platform User)** (기존 명칭: Vertex AI 사용자) 역할(`roles/aiplatform.user`)을 가지고 있어야 합니다.
 
 ```bash
 gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
   --member="serviceAccount:YOUR_SERVICE_ACCOUNT" \
+  --role="roles/aiplatform.user"
+```
+
+#### 2. 테스트 사용자 계정 권한 (Claude Code 등 테스트 클라이언트용)
+테스트를 원활하게 진행하려면, 테스트를 수행하는 **실제 Google 사용자 계정**에도 아래의 역할(IAM Role)들이 부여되어 있어야 합니다.
+
+*   **Agent Platform 사용자 (Agent Platform User)** (`roles/aiplatform.user`): proxy를 통해 Claude 모델에 호출을 전달하여 응답을 받아오기 위해 필요합니다.
+*   **Apigee 읽기 전용 관리자 (Apigee Read-only Admin)** (`roles/apigee.readOnlyAdmin`): 테스트 스크립트(`./test-quota.sh`) 등에서 앱 자격증명(API Key)을 자동으로 조회하기 위해 필요합니다. (기본 `Apigee API Reader` 역할은 키 조회 권한이 부족하여 실패합니다.)
+
+```bash
+# Apigee API Key 조회를 위한 권한 부여
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="user:user@domain.com" \
+  --role="roles/apigee.readOnlyAdmin"
+
+# Claude API 호출을 위한 권한 부여
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="user:user@domain.com" \
   --role="roles/aiplatform.user"
 ```
 
@@ -195,7 +215,7 @@ gcloud auth application-default login
 **이 작업이 왜 필요한가요?**
 *   **액세스 토큰 생성**: `claude` CLI 클라이언트는 로컬의 Google Application Default Credentials를 활용해 Google 액세스 토큰을 동적으로 생성하고, 매 API 요청마다 `Authorization: Bearer <TOKEN>` 헤더에 실어 전송합니다.
 *   **사용자 신원 기반 쿼타 격리**: Apigee 프록시는 이 토큰을 가로채 Google OAuth2 토큰 정보 서비스를 통해 검증하고 사용자의 이메일을 추출하여 고유 쿼타 식별자(`google.email`)로 활용합니다. 유효한 ADC 토큰이 없으면 Apigee가 사용자 신원을 검증할 수 없어 요청이 거부됩니다.
-*   **타겟 권한 전달 (Pass-through)**: 프록시는 이 토큰을 Vertex AI로 그대로 전달합니다. 로컬 인증에 사용하는 Google 계정이 GCP 프로젝트 내에서 **Vertex AI 사용자**(`roles/aiplatform.user`) 역할을 가지고 있어야 하며, 그렇지 않을 경우 API 호출 시 403 Forbidden 오류가 발생합니다.
+*   **타겟 권한 전달 (Pass-through)**: 프록시는 이 토큰을 Vertex AI로 그대로 전달합니다. 로컬 인증에 사용하는 Google 계정이 GCP 프로젝트 내에서 **Agent Platform 사용자 (Agent Platform User)** (기존 명칭: Vertex AI 사용자) 역할(`roles/aiplatform.user`)을 가지고 있어야 하며, 그렇지 않을 경우 API 호출 시 403 Forbidden 오류가 발생합니다.
 
 ### 2. Claude Code 설정 구성
 `~/.claude/settings.json` 파일이 Apigee 프록시를 통해 요청을 라우팅하도록 설정되어 있는지 확인합니다:
