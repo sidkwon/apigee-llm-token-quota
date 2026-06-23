@@ -11,7 +11,8 @@
   "model": "{model}",
   "prompt_tokens": {prompt_token_count},
   "candidates_tokens": {candidates_token_count},
-  "total_tokens": {total_token_count}
+  "total_tokens": {total_token_count},
+  "response_code": {message.status.code}
 }
     </Message>
   </CloudLogging>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage continueOnError="false" enabled="true" name="AM-InitializeLogVariables">
+  <DisplayName>AM-InitializeLogVariables</DisplayName>
+  <AssignVariable>
+    <Name>total_token_count</Name>
+    <Value>0</Value>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>prompt_token_count</Name>
+    <Value>0</Value>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>candidates_token_count</Name>
+    <Value>0</Value>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>model</Name>
+    <Value>unknown_model</Value>
+  </AssignVariable>
+</AssignMessage>

@@ -15,6 +15,9 @@
   <PreFlow name="PreFlow">
     <Request>
       <Step>
+        <Name>AM-InitializeLogVariables</Name>
+      </Step>
+      <Step>
         <Name>VA-VerifyAPIKey</Name>
       </Step>
       <Step>
@@ -72,4 +75,11 @@
   <RouteRule name="default">
     <TargetEndpoint>default</TargetEndpoint>
   </RouteRule>
+  <PostClientFlow name="PostClientFlow">
+    <Response>
+      <Step>
+        <Name>ML-LogTokenUsage</Name>
+      </Step>
+    </Response>
+  </PostClientFlow>
 </ProxyEndpoint>

@@ -27,10 +27,7 @@
         <Name>DC-CollectTokenCounts</Name>
         <Condition>response.header.Content-Type != "text/event-stream"</Condition>
       </Step>
-      <Step>
-        <Name>ML-LogTokenUsage</Name>
-        <Condition>(response.header.Content-Type != "text/event-stream") and (total_token_count != null) and (total_token_count > 0)</Condition>
-      </Step>
+
     </Response>
   </PostFlow>
   <EventFlow content-type="text/event-stream">
@@ -46,10 +43,7 @@
         <Name>DC-CollectTokenCounts</Name>
         <Condition>is_final_usage_event = true</Condition>
       </Step>
-      <Step>
-        <Name>ML-LogTokenUsage</Name>
-        <Condition>is_final_usage_event = true</Condition>
-      </Step>
+
     </Response>
   </EventFlow>
   <HTTPTargetConnection>

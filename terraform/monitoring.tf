@@ -1,6 +1,6 @@
 resource "google_logging_metric" "apigee_llm_total_tokens" {
   name   = "apigee_llm_total_tokens"
-  filter = "logName=\"projects/${var.project_id}/logs/apigee-llm-token-quota\" AND jsonPayload.total_tokens > 0"
+  filter = "logName=\"projects/${var.project_id}/logs/apigee-llm-token-quota\""
   
   metric_descriptor {
     metric_kind = "DELTA"
@@ -20,12 +20,18 @@ resource "google_logging_metric" "apigee_llm_total_tokens" {
       value_type  = "STRING"
       description = "Apigee API Product"
     }
+    labels {
+      key         = "response_code"
+      value_type  = "INT64"
+      description = "HTTP Response Status Code"
+    }
   }
   value_extractor = "EXTRACT(jsonPayload.total_tokens)"
   label_extractors = {
-    "user_email"  = "EXTRACT(jsonPayload.user_email)"
-    "model"       = "EXTRACT(jsonPayload.model)"
-    "api_product" = "EXTRACT(jsonPayload.api_product)"
+    "user_email"    = "EXTRACT(jsonPayload.user_email)"
+    "model"         = "EXTRACT(jsonPayload.model)"
+    "api_product"   = "EXTRACT(jsonPayload.api_product)"
+    "response_code" = "EXTRACT(jsonPayload.response_code)"
   }
   
   bucket_options {
@@ -85,6 +91,19 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
                 "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [api_product: metric.api_product], sum(val())"
               },
               "plotType": "STACKED_AREA"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Request Count by Response Code & User",
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [user_email: metric.user_email, response_code: metric.response_code], count(val())"
+              },
+              "plotType": "STACKED_BAR"
             }
           ]
         }
