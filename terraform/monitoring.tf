@@ -161,7 +161,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
         "timeSeriesTable": {
           "columnSettings": [
             {
-              "column": "metric.label.user_email",
+              "column": "user_email",
               "visible": true,
               "displayName": "User Email"
             },
@@ -173,17 +173,9 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           ],
           "dataSets": [
             {
+              "minAlignmentPeriod": "3600s",
               "timeSeriesQuery": {
-                "timeSeriesFilter": {
-                  "filter": "metric.type=\"logging.googleapis.com/user/apigee_llm_total_tokens\"",
-                  "aggregation": {
-                    "perSeriesAligner": "ALIGN_SUM",
-                    "crossSeriesReducer": "REDUCE_SUM",
-                    "groupByFields": [
-                      "metric.label.user_email"
-                    ]
-                  }
-                }
+                "prometheusQuery": "topk(10, sum(sum_over_time(logging_googleapis_com:user_apigee_llm_total_tokens_sum{monitored_resource=\"global\"}[$${__interval}])) by (user_email))"
               }
             }
           ]
