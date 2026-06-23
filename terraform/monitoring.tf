@@ -1,7 +1,58 @@
 resource "google_logging_metric" "apigee_llm_total_tokens" {
   name   = "apigee_llm_total_tokens"
   filter = "logName=\"projects/${var.project_id}/logs/apigee-llm-token-quota\""
-  
+
+  metric_descriptor {
+    metric_kind = "DELTA"
+    value_type  = "DISTRIBUTION"
+    labels {
+      key         = "user_email"
+      value_type  = "STRING"
+      description = "User email address"
+    }
+    labels {
+      key         = "developer_email"
+      value_type  = "STRING"
+      description = "Developer partner email address"
+    }
+    labels {
+      key         = "model"
+      value_type  = "STRING"
+      description = "Claude model used"
+    }
+    labels {
+      key         = "api_product"
+      value_type  = "STRING"
+      description = "Apigee API Product"
+    }
+    labels {
+      key         = "response_code"
+      value_type  = "STRING"
+      description = "HTTP Response Status Code"
+    }
+  }
+  value_extractor = "EXTRACT(jsonPayload.total_tokens)"
+  label_extractors = {
+    "user_email"      = "EXTRACT(jsonPayload.user_email)"
+    "developer_email" = "EXTRACT(jsonPayload.developer_email)"
+    "model"           = "EXTRACT(jsonPayload.model)"
+    "api_product"     = "EXTRACT(jsonPayload.api_product)"
+    "response_code"   = "EXTRACT(jsonPayload.response_code)"
+  }
+
+  bucket_options {
+    linear_buckets {
+      num_finite_buckets = 20
+      width              = 1000
+      offset             = 0
+    }
+  }
+}
+
+resource "google_logging_metric" "apigee_llm_prompt_tokens" {
+  name   = "apigee_llm_prompt_tokens"
+  filter = "logName=\"projects/${var.project_id}/logs/apigee-llm-token-quota\""
+
   metric_descriptor {
     metric_kind = "DELTA"
     value_type  = "DISTRIBUTION"
@@ -26,14 +77,59 @@ resource "google_logging_metric" "apigee_llm_total_tokens" {
       description = "HTTP Response Status Code"
     }
   }
-  value_extractor = "EXTRACT(jsonPayload.total_tokens)"
+  value_extractor = "EXTRACT(jsonPayload.prompt_tokens)"
   label_extractors = {
     "user_email"    = "EXTRACT(jsonPayload.user_email)"
     "model"         = "EXTRACT(jsonPayload.model)"
     "api_product"   = "EXTRACT(jsonPayload.api_product)"
     "response_code" = "EXTRACT(jsonPayload.response_code)"
   }
-  
+
+  bucket_options {
+    linear_buckets {
+      num_finite_buckets = 20
+      width              = 1000
+      offset             = 0
+    }
+  }
+}
+
+resource "google_logging_metric" "apigee_llm_candidates_tokens" {
+  name   = "apigee_llm_candidates_tokens"
+  filter = "logName=\"projects/${var.project_id}/logs/apigee-llm-token-quota\""
+
+  metric_descriptor {
+    metric_kind = "DELTA"
+    value_type  = "DISTRIBUTION"
+    labels {
+      key         = "user_email"
+      value_type  = "STRING"
+      description = "User email address"
+    }
+    labels {
+      key         = "model"
+      value_type  = "STRING"
+      description = "Claude model used"
+    }
+    labels {
+      key         = "api_product"
+      value_type  = "STRING"
+      description = "Apigee API Product"
+    }
+    labels {
+      key         = "response_code"
+      value_type  = "STRING"
+      description = "HTTP Response Status Code"
+    }
+  }
+  value_extractor = "EXTRACT(jsonPayload.candidates_tokens)"
+  label_extractors = {
+    "user_email"    = "EXTRACT(jsonPayload.user_email)"
+    "model"         = "EXTRACT(jsonPayload.model)"
+    "api_product"   = "EXTRACT(jsonPayload.api_product)"
+    "response_code" = "EXTRACT(jsonPayload.response_code)"
+  }
+
   bucket_options {
     linear_buckets {
       num_finite_buckets = 20
@@ -46,7 +142,7 @@ resource "google_logging_metric" "apigee_llm_total_tokens" {
 resource "google_logging_metric" "apigee_llm_request_count" {
   name   = "apigee_llm_request_count"
   filter = "logName=\"projects/${var.project_id}/logs/apigee-llm-token-quota\""
-  
+
   metric_descriptor {
     metric_kind = "DELTA"
     value_type  = "INT64"
@@ -71,7 +167,7 @@ resource "google_logging_metric" "apigee_llm_request_count" {
       description = "HTTP Response Status Code"
     }
   }
-  
+
   label_extractors = {
     "user_email"    = "EXTRACT(jsonPayload.user_email)"
     "model"         = "EXTRACT(jsonPayload.model)"
@@ -161,7 +257,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
         "timeSeriesTable": {
           "columnSettings": [
             {
-              "column": "user_email",
+              "column": "metric.user_email",
               "visible": true,
               "displayName": "User Email"
             },
@@ -173,12 +269,61 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           ],
           "dataSets": [
             {
-              "minAlignmentPeriod": "3600s",
               "timeSeriesQuery": {
-                "prometheusQuery": "topk(10, sum(sum_over_time(logging_googleapis_com:user_apigee_llm_total_tokens_sum{monitored_resource=\"global\"}[$${__interval}])) by (user_email))"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [metric.user_email], sum(val()) | top 10"
               }
             }
           ]
+        }
+      },
+      {
+        "title": "Token Consumption Ratio by Claude Model",
+        "pieChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [model: metric.model], sum(val())"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "title": "Average Tokens per Request",
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesQueryLanguage": "{\n  fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [], sum(val()) ;\n  fetch global | metric 'logging.googleapis.com/user/apigee_llm_request_count' | align | group_by [], sum(val())\n} | ratio"
+              },
+              "plotType": "LINE",
+              "legendTemplate": "Average Tokens"
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "yAxis": {
+            "label": "Tokens / Req",
+            "scale": "LINEAR"
+          }
+        }
+      },
+      {
+        "title": "Token Usage Growth Rate (1h %)",
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align delta(1m) | group_by [], sum(val()) | { ident; time_shift 1h } | ratio | sub(1) | mul(100)"
+              },
+              "plotType": "LINE",
+              "legendTemplate": "Growth Rate (%)"
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "yAxis": {
+            "label": "Change (%)",
+            "scale": "LINEAR"
+          }
         }
       }
     ]
