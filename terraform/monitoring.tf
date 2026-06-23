@@ -43,6 +43,43 @@ resource "google_logging_metric" "apigee_llm_total_tokens" {
   }
 }
 
+resource "google_logging_metric" "apigee_llm_request_count" {
+  name   = "apigee_llm_request_count"
+  filter = "logName=\"projects/${var.project_id}/logs/apigee-llm-token-quota\""
+  
+  metric_descriptor {
+    metric_kind = "DELTA"
+    value_type  = "INT64"
+    labels {
+      key         = "user_email"
+      value_type  = "STRING"
+      description = "User email address"
+    }
+    labels {
+      key         = "model"
+      value_type  = "STRING"
+      description = "Claude model used"
+    }
+    labels {
+      key         = "api_product"
+      value_type  = "STRING"
+      description = "Apigee API Product"
+    }
+    labels {
+      key         = "response_code"
+      value_type  = "STRING"
+      description = "HTTP Response Status Code"
+    }
+  }
+  
+  label_extractors = {
+    "user_email"    = "EXTRACT(jsonPayload.user_email)"
+    "model"         = "EXTRACT(jsonPayload.model)"
+    "api_product"   = "EXTRACT(jsonPayload.api_product)"
+    "response_code" = "EXTRACT(jsonPayload.response_code)"
+  }
+}
+
 resource "google_monitoring_dashboard" "llm_dashboard" {
   project        = var.project_id
   dashboard_json = <<EOF
@@ -102,10 +139,10 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "metric.type=\"logging.googleapis.com/user/apigee_llm_total_tokens\" AND metric.label.response_code=monitoring.regex.full_match(\"[0-9]+\")",
+                  "filter": "metric.type=\"logging.googleapis.com/user/apigee_llm_request_count\" AND metric.label.response_code=monitoring.regex.full_match(\"[0-9]+\")",
                   "aggregation": {
                     "alignmentPeriod": "60s",
-                    "perSeriesAligner": "ALIGN_COUNT",
+                    "perSeriesAligner": "ALIGN_DELTA",
                     "crossSeriesReducer": "REDUCE_SUM",
                     "groupByFields": [
                       "metric.label.response_code"
