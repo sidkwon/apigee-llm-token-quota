@@ -101,7 +101,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | count_from | group_by [response_code: metric.response_code], sum(val())"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | filter has_value(metric.response_code) | count_from | group_by [response_code: metric.response_code], sum(val())"
               },
               "plotType": "STACKED_BAR"
             }
