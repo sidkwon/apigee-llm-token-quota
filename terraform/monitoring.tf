@@ -96,7 +96,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
               "timeSeriesQuery": {
                 "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [user_email: metric.user_email], sum(val())"
               },
-              "plotType": "STACKED_BAR"
+              "plotType": "LINE"
             }
           ],
           "timeshiftDuration": "0s",

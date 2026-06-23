@@ -57,7 +57,7 @@ All resources are split into specialized files following Terraform best practice
   - `apigee_llm_request_count`: A `DELTA` `INT64` counter metric that increments for each log entry. It has label extractors for `user_email`, `model`, `api_product`, and `response_code` (as a `STRING`).
 - **Monitoring Dashboard (`google_monitoring_dashboard`)**:
   - Provisions a Google Cloud Monitoring Dashboard named `"Apigee LLM Quota & Token Usage Dashboard"` with a 2-column grid layout.
-  - **Chart 1: LLM Token Usage Trend by User (Total)**: Stacked bar chart showing total accumulated tokens consumed grouped by `user_email`.
+  - **Chart 1: LLM Token Usage Trend by User (Total)**: Line chart showing total accumulated tokens consumed grouped by `user_email`.
   - **Chart 2: Token Consumption by Claude Model**: Line chart visualizing token usage broken down by Claude models (e.g. `claude-sonnet-4-6`).
   - **Chart 3: Token Consumption by Apigee API Product**: Stacked area chart showing total token usage by API products (`bronze`, `silver`, etc.).
   - **Chart 4: Request Count by Response Code**: Stacked bar chart demonstrating request frequency grouped by HTTP response status codes (e.g. `200`, `429`). It automatically filters out empty/null codes and displays clean count values in tooltips using dynamic alignment period adjustments.

@@ -159,7 +159,7 @@ The Apigee proxy automatically outputs detailed JSON logs to Google Cloud Loggin
 These logs are compiled into metrics and displayed on a unified GCP Monitoring Dashboard provisioned automatically via Terraform:
 
 ### 📈 Dashboard Charts:
-1.  **LLM Token Usage Trend by User (Total)**: Stacked bar chart showing total cumulative token consumption grouped by `user_email` to help visualize usage distribution.
+1.  **LLM Token Usage Trend by User (Total)**: Line chart showing total cumulative token consumption grouped by `user_email` to help visualize usage distribution.
 2.  **Token Consumption by Claude Model**: Line chart demonstrating token usage trends separated by Claude model versions (e.g. `claude-sonnet-4-6`, `claude-haiku-4-5`).
 3.  **Token Consumption by Apigee API Product**: Stacked area chart showing total tokens consumed per Apigee API Product tier (`bronze`, `silver`, etc.).
 4.  **Request Count by Response Code**: Stacked bar chart visualizing the frequency of HTTP response status codes (e.g. `200` OK, `429` Quota Exceeded) mapped to help monitor error rates. Tooltips show clean, single-count aggregates via automatic dynamic alignment period adjustment.
