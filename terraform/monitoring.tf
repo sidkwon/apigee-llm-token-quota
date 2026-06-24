@@ -259,13 +259,26 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
       {
         "title": "Top 10 Token Consuming Users",
         "timeSeriesTable": {
+          "columnSettings": [
+            {
+              "column": "metric.user_email",
+              "visible": true,
+              "displayName": "User Email"
+            },
+            {
+              "column": "value",
+              "visible": true,
+              "displayName": "Total Tokens"
+            }
+          ],
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [user_email: metric.user_email], sum(val()) | top 10"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [metric.user_email], sum(val()) | top 10"
               }
             }
-          ]
+          ],
+          "metricVisualization": "NUMBER"
         }
       },
       {
