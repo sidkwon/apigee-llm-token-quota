@@ -234,10 +234,20 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_request_count' | align | group_by [response_code: metric.response_code], sum(val())"
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"logging.googleapis.com/user/apigee_llm_request_count\" AND metric.label.response_code=monitoring.regex.full_match(\"[0-9]+\")",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_DELTA",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": [
+                      "metric.label.response_code"
+                    ]
+                  }
+                }
               },
               "plotType": "STACKED_BAR",
-              "legendTemplate": "$${response_code}"
+              "legendTemplate": "$${metric.labels.response_code}"
             }
           ],
           "yAxis": {
@@ -251,7 +261,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
         "timeSeriesTable": {
           "columnSettings": [
             {
-              "column": "user_email",
+              "column": "metric.user_email",
               "visible": true,
               "displayName": "User Email"
             },
@@ -264,7 +274,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [user_email: metric.user_email], sum(val()) | top 10"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [metric.user_email], sum(val()) | top 10"
               }
             }
           ]
@@ -276,7 +286,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [model: metric.model], sum(val())"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [model: metric.model], sum(val()) | { ident ; group_by [], sum(val()) } | ratio | mul(100)"
               }
             }
           ]
