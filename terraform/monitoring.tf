@@ -282,7 +282,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [model: metric.model], sum(val())"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align delta(1m) | group_by [model: metric.model], sum(val())"
               }
             }
           ]
