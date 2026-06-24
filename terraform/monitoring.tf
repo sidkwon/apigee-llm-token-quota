@@ -259,18 +259,6 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
       {
         "title": "Top 10 Token Consuming Users",
         "timeSeriesTable": {
-          "columnSettings": [
-            {
-              "column": "user_email",
-              "visible": true,
-              "displayName": "User Email"
-            },
-            {
-              "column": "value",
-              "visible": true,
-              "displayName": "Total Tokens"
-            }
-          ],
           "dataSets": [
             {
               "timeSeriesQuery": {
