@@ -257,7 +257,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
         "timeSeriesTable": {
           "columnSettings": [
             {
-              "column": "metric.user_email",
+              "column": "user_email",
               "visible": true,
               "displayName": "User Email"
             },
@@ -270,7 +270,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [metric.user_email], sum(val()) | top 10"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [user_email: metric.user_email], sum(val()) | top 10"
               }
             }
           ]
@@ -282,7 +282,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align delta(1m) | group_by [model: metric.model], sum(val())"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [model: metric.model], sum(val())"
               }
             }
           ]
@@ -313,7 +313,7 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align delta(1m) | group_by [], sum(val()) | { ident; time_shift 1h } | ratio | sub(1) | mul(100)"
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_total_tokens' | align | group_by [], sum(val()) | { ident; time_shift 1h } | ratio | sub(1) | mul(100)"
               },
               "plotType": "LINE",
               "legendTemplate": "Growth Rate (%)"
