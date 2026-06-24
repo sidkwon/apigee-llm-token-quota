@@ -249,7 +249,11 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
               "plotType": "STACKED_BAR",
               "legendTemplate": "$${metric.labels.response_code}"
             }
-          ]
+          ],
+          "yAxis": {
+            "label": "Requests",
+            "scale": "LINEAR"
+          }
         }
       },
       {
