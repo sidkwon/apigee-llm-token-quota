@@ -229,6 +229,7 @@ Ensure your `~/.claude/settings.json` is configured to route calls via your Apig
     "ANTHROPIC_CUSTOM_HEADERS": "x-apikey: YOUR_API_KEY",
     "ANTHROPIC_MODEL": "claude-sonnet-4-6",          // Can also be set to "claude-opus-4-8"
     "ANTHROPIC_SMALL_FAST_MODEL": "claude-haiku-4-5",
+    "ANTHROPIC_DEFAULT_MODEL": "claude-haiku-4-5",   // Recommended fallback model for background helper tasks
     "CLOUD_ML_REGION": "global"                      // Routes via regional dynamic routing in Apigee
   }
 }
