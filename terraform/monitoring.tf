@@ -234,20 +234,10 @@ resource "google_monitoring_dashboard" "llm_dashboard" {
           "dataSets": [
             {
               "timeSeriesQuery": {
-                "timeSeriesFilter": {
-                  "filter": "metric.type=\"logging.googleapis.com/user/apigee_llm_request_count\" AND metric.label.response_code=monitoring.regex.full_match(\"[0-9]+\")",
-                  "aggregation": {
-                    "alignmentPeriod": "60s",
-                    "perSeriesAligner": "ALIGN_DELTA",
-                    "crossSeriesReducer": "REDUCE_SUM",
-                    "groupByFields": [
-                      "metric.label.response_code"
-                    ]
-                  }
-                }
+                "timeSeriesQueryLanguage": "fetch global | metric 'logging.googleapis.com/user/apigee_llm_request_count' | align | group_by [response_code: metric.response_code], sum(val())"
               },
               "plotType": "STACKED_BAR",
-              "legendTemplate": "$${metric.labels.response_code}"
+              "legendTemplate": "$${response_code}"
             }
           ],
           "yAxis": {
