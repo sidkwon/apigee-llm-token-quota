@@ -221,7 +221,7 @@ gcloud auth application-default login
 *   **Target Authorization (Pass-through)**: The proxy forwards this token directly to Agent Platform (Vertex AI). Ensure your Google account has the **Agent Platform User** (formerly Vertex AI User) role (`roles/aiplatform.user`) in the GCP project, or the API call will return a 403 Forbidden error.
 
 ### 2. Configure Claude Code Settings
-Ensure your `~/.claude/settings.json` is configured to route calls via your Apigee proxy:
+Ensure your `~/.claude/settings.json` is configured to route calls via your Apigee proxy (For full details on model environment overrides, refer to the [Claude Code Model Configuration Docs](https://code.claude.com/docs/en/model-config)):
 
 ```json
 {
