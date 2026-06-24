@@ -28,9 +28,9 @@ All resources are split into specialized files following Terraform best practice
 - **IAM Policy bindings**: Dynamically grants `roles/cloudkms.cryptoKeyEncrypterDecrypter` to the Apigee service agent for both DB and instance keys (ensured using explicit `depends_on` relationships).
 - **Apigee Demo Service Account**:
   - Creates the `apigee-demo` service account.
-  - Grants the Apigee service identity `roles/iam.serviceAccountUser` and `roles/iam.serviceAccountTokenCreator` permissions on the service account (allowing Apigee proxies to impersonate it and generate OAuth/ID tokens).
-  - Grants the service account `roles/aiplatform.user` permissions on the project to allow successful calls to Vertex AI Gemini/Claude API endpoints.
-  - Grants the service account `roles/logging.logWriter` permissions to write custom JSON payloads to Google Cloud Logging.
+  - Grants the Apigee service identity `roles/iam.serviceAccountUser` and `roles/iam.serviceAccountTokenCreator` permissions on the service account (allowing Apigee to bind the service account to deployed proxies).
+  - Grants the service account `roles/logging.logWriter` permissions to write custom JSON payloads to Google Cloud Logging via the `MessageLogging` policy.
+  - *Note: `roles/aiplatform.user` is not required on this service account because target requests pass through the end user's access token.*
 
 ### 2. Apigee Entities (`main.tf`)
 - **Apigee Organization (`google_apigee_organization`)**: Created with `runtime_type = "CLOUD"`, `billing_type = "PAYG"`, and `disable_vpc_peering = true`.

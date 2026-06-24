@@ -140,12 +140,8 @@ resource "google_apigee_envgroup_attachment" "apigee_envgroup_attachment" {
   environment = google_apigee_environment.apigee_env.name
 }
 
-# Grant Vertex AI User role to the Apigee Demo Service Account
-resource "google_project_iam_member" "apigee_sa_vertex_user" {
-  project = var.project_id
-  role    = "roles/aiplatform.user"
-  member  = "serviceAccount:${google_service_account.apigee_demo.email}"
-}
+# Note: roles/aiplatform.user is NOT granted to apigee-demo service account because 
+# the proxy passes through the client's (end user's) Google Access Token to Agent Platform (Vertex AI).
 
 # Grant Logging Log Writer role to the Apigee Demo Service Account
 resource "google_project_iam_member" "apigee_sa_logging_writer" {
