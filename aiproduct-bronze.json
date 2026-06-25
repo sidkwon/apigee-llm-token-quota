@@ -5,10 +5,8 @@
       "llmOperations": [
         {
           "resource": "/",
-          "methods": [
-            "POST"
-          ],
-          "model": "claude-sonnet-4-6"
+          "methods": ["POST"],
+          "model": "sonnet"
         }
       ],
       "llmTokenQuota": {
@@ -22,10 +20,8 @@
       "llmOperations": [
         {
           "resource": "/",
-          "methods": [
-            "POST"
-          ],
-          "model": "claude-haiku-4-5"
+          "methods": ["POST"],
+          "model": "haiku"
         }
       ],
       "llmTokenQuota": {
@@ -39,10 +35,23 @@
       "llmOperations": [
         {
           "resource": "/",
-          "methods": [
-            "POST"
-          ],
-          "model": "claude-opus-4-8"
+          "methods": ["POST"],
+          "model": "opus"
+        }
+      ],
+      "llmTokenQuota": {
+        "limit": "1000",
+        "interval": "1",
+        "timeUnit": "minute"
+      }
+    },
+    {
+      "apiSource": "llm-token-limits-v2",
+      "llmOperations": [
+        {
+          "resource": "/",
+          "methods": ["POST"],
+          "model": "count-tokens"
         }
       ],
       "llmTokenQuota": {

@@ -38,3 +38,25 @@ if (reqContent) {
         }
     }
 }
+
+// Normalize model variable to clean categories (sonnet, haiku, opus) for API Product matching
+var rawModel = context.getVariable("model");
+if (!rawModel || rawModel.indexOf("count-token") !== -1) {
+    if (typeof payload !== "undefined" && payload && payload.model) {
+        rawModel = payload.model;
+    }
+}
+
+var normalizedModel = "sonnet"; // default fallback
+if (rawModel) {
+    var lowerModel = rawModel.toLowerCase();
+    if (lowerModel.indexOf("haiku") !== -1) {
+        normalizedModel = "haiku";
+    } else if (lowerModel.indexOf("opus") !== -1) {
+        normalizedModel = "opus";
+    } else if (lowerModel.indexOf("sonnet") !== -1) {
+        normalizedModel = "sonnet";
+    }
+}
+context.setVariable("model", normalizedModel);
+

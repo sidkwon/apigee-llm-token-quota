@@ -1,6 +1,6 @@
 # Apigee LLM User-Based Token Quota Sample
 
-This proxy demonstrates how to implement **User-Based LLM Token Quota** enforcement using Apigee. It intercepts requests to Anthropic Claude (via Agent Platform / Vertex AI), calculates token usage, and enforces limits per user email.
+This proxy demonstrates how to implement **User-Based LLM Token Quota** enforcement using Apigee. It intercepts requests to Anthropic Claude (via Agent Platform (fka Vertex AI)), calculates token usage, and enforces limits per user email.
 
 ## 🔑 Key Features
 
@@ -15,14 +15,14 @@ This proxy demonstrates how to implement **User-Based LLM Token Quota** enforcem
 
 3.  **Secure Authentication**:
     *   Validates Google Access Tokens via `oauth2.googleapis.com/tokeninfo`.
-    *   Passes through the client's Google Access Token (user credentials) to Agent Platform (Vertex AI), enabling GCP-level auditing and dynamic billing labels.
+    *   Passes through the client's Google Access Token (user credentials) to Agent Platform (fka Vertex AI), enabling GCP-level auditing and dynamic billing labels.
 
 4.  **Security & Performance Hardening**:
     *   **OAuth Token Caching**: Caches token validation mappings for 300 seconds to minimize external API call latency and prevent hitting Google API rate limits.
     *   **SSRF Protection**: Performs strict regex validation on dynamic regional target locations to prevent host header injection.
     *   **JSON Threat Protection**: Enforces structural payload constraints (depth, array/string sizes) to block Denial-of-Service (DoS) attacks.
     *   **Streaming (SSE) Support**: Supports Server-Sent Events (SSE) responses via Apigee `EventFlow` response chunk processing, correctly tracking cumulative token usage for clients like `claude-code` that utilize streaming.
-    *   **Decompression Error Prevention**: Strips the client's `Accept-Encoding` header when forwarding requests to Agent Platform (Vertex AI), preventing client-side `ZlibError` or decompression mismatches during streaming responses.
+    *   **Decompression Error Prevention**: Strips the client's `Accept-Encoding` header when forwarding requests to Agent Platform (fka Vertex AI), preventing client-side `ZlibError` or decompression mismatches during streaming responses.
 
 ## 🏗️ Architecture Flow
 
@@ -71,7 +71,10 @@ graph TD
 ## 🛠️ Configuration Details
 
 ### Quota Logic
-The user isolation is achieved through the `<Identifier>` element in the Quota policies:
+User isolation and two-stage token management are achieved through the following Quota policies:
+
+#### 1. EnforceOnly Policy (`LTQ-TokenEnforce`)
+Checks the user's available quota *before* calling the Agent Platform (fka Vertex AI) backend.
 
 ```xml
 <LLMTokenQuota name="LTQ-TokenEnforce" type="calendar">
@@ -92,6 +95,24 @@ The user isolation is achieved through the `<Identifier>` element in the Quota p
 - **Limit**: Defined in the API Product (e.g., 1000 tokens/min).
 - **Identifier**: `google.email` (extracted from Access Token).
 - **Result**: Every unique email gets its own bucket of 1000 tokens.
+
+#### 2. CountOnly Policy (`LTQ-TokenCount`)
+Consumes the actual token usage returned by the Agent Platform (fka Vertex AI) API *after* successful execution.
+
+```xml
+<LLMTokenQuota name="LTQ-TokenCount" type="calendar">
+    <Allow count="10000" countRef="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.limit"/>
+    <Interval ref="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.interval">1</Interval>
+    <TimeUnit ref="verifyapikey.VA-VerifyAPIKey.apiproduct.developer.llmQuota.timeunit">minute</TimeUnit>
+    
+    <Identifier ref="google.email"/>
+    <StartTime>2013-08-21 10:00:00</StartTime>
+    <LLMModelSource>{model}</LLMModelSource>
+    <!-- Use dynamic weight calculated from LLM response (total_token_count) -->
+    <Weight ref="total_token_count"/>
+    <SharedName>common-counter</SharedName>
+</LLMTokenQuota>
+```
 
 ## 📋 Prerequisites
 
@@ -119,7 +140,7 @@ gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
 ```
 
 > [!NOTE]
-> The proxy forwards the client's Google Access Token directly to Agent Platform / Vertex AI (Target Pass-through). Therefore, the **Agent Platform User** (`roles/aiplatform.user`) role is required on the **calling user account**, not the proxy service account.
+> The proxy forwards the client's Google Access Token directly to Agent Platform (fka Vertex AI) (Target Pass-through). Therefore, the **Agent Platform User** (`roles/aiplatform.user`) role is required on the **calling user account**, not the proxy service account.
 
 #### 2. Test User Account Permissions (For Claude Code & Test Clients)
 To perform testing successfully, the **actual Google User Account** executing the tests must also be granted the following IAM roles:
@@ -139,14 +160,14 @@ gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
   --role="roles/aiplatform.user"
 ```
 
-### Agent Platform (Vertex AI) Model Enablement
-To use Claude models, you must enable them in the **Agent Platform (formerly Vertex AI) Model Garden**.
+### Agent Platform (fka Vertex AI) Model Enablement
+To use Claude models, you must enable them in the **Agent Platform (fka Vertex AI) Model Garden**.
 Specifically, ensure the following models are enabled in your Google Cloud project (`YOUR_PROJECT_ID`):
 - **Claude Opus 4.8** (or `claude-opus-4-8`)
 - **Claude Sonnet 4.6** (or `claude-sonnet-4-6`)
 - **Claude Haiku 4.5** (or `claude-haiku-4-5`)
 
-Visit [Agent Platform / Vertex AI Model Garden](https://console.cloud.google.com/vertex-ai/model-garden) and search for "Claude" to enable them.
+Visit [Agent Platform (fka Vertex AI) Model Garden](https://console.cloud.google.com/vertex-ai/model-garden) and search for "Claude" to enable them.
 
 ## 🚀 Deployment
 
@@ -192,7 +213,7 @@ These logs are compiled into metrics and displayed on a unified GCP Monitoring D
 
 ## 🏷️ GCP Billing Labels (Agent Platform / Vertex AI)
 
-To support organizational cost-center tracking directly within the Google Cloud Billing console, the proxy automatically attaches custom tracking labels to all outgoing Agent Platform (Vertex AI) requests.
+To support organizational cost-center tracking directly within the Google Cloud Billing console, the proxy automatically attaches custom tracking labels to all outgoing Agent Platform (fka Vertex AI) requests.
 
 *   **HTTP Header**: `X-Vertex-AI-Labels`
 *   **Format**: Base64-encoded JSON payload containing:
@@ -218,7 +239,7 @@ gcloud auth application-default login
 **Why is this required?**
 *   **Access Token Generation**: The `claude` CLI client uses local Google Application Default Credentials to dynamically generate a Google Access Token, which it passes in the `Authorization: Bearer <TOKEN>` header of every API request.
 *   **User Identity Quota Isolation**: The Apigee proxy intercepts this token, validates it against Google OAuth2 token info service, extracts your user email, and uses it as the unique quota identifier (`google.email`). Without a valid ADC token, Apigee cannot authenticate your user identity and will reject the request.
-*   **Target Authorization (Pass-through)**: The proxy forwards this token directly to Agent Platform (Vertex AI). Ensure your Google account has the **Agent Platform User** (formerly Vertex AI User) role (`roles/aiplatform.user`) in the GCP project, or the API call will return a 403 Forbidden error.
+*   **Target Authorization (Pass-through)**: The proxy forwards this token directly to Agent Platform (fka Vertex AI). Ensure your Google account has the **Agent Platform User** role (`roles/aiplatform.user`) in the GCP project, or the API call will return a 403 Forbidden error.
 
 ### 2. Configure Claude Code Settings
 Ensure your `~/.claude/settings.json` is configured to route calls via your Apigee proxy (For full details on model environment overrides, refer to the [Claude Code Model Configuration Docs](https://code.claude.com/docs/en/model-config)):
@@ -230,14 +251,18 @@ Ensure your `~/.claude/settings.json` is configured to route calls via your Apig
     "ANTHROPIC_VERTEX_PROJECT_ID": "YOUR_PROJECT_ID",
     "ANTHROPIC_VERTEX_BASE_URL": "https://YOUR_APIGEE_HOST/v2/samples/llm-token-limits/v1",
     "ANTHROPIC_CUSTOM_HEADERS": "x-apikey: YOUR_API_KEY",
-    "ANTHROPIC_MODEL": "claude-sonnet-4-6",          // Can also be set to "claude-opus-4-8"
+    "ANTHROPIC_MODEL": "claude-sonnet-4-6",
     "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8",
-    "CLOUD_ML_REGION": "global"                      // Routes via regional dynamic routing in Apigee
+    "CLOUD_ML_REGION": "global"
   }
 }
 ```
+
+> [!NOTE]
+> * `ANTHROPIC_MODEL`은 필요에 따라 `"claude-opus-4-8"` 등으로 변경하여 설정할 수 있습니다.
+> * `CLOUD_ML_REGION` 설정 시 Apigee 프록시가 해당 리전 정보를 기반으로 동적 백엔드 라우팅을 수행합니다.
 
 
 ## 🧹 Cleanup

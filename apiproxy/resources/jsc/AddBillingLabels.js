@@ -1,5 +1,11 @@
-// 1. Get developer email verified by VerifyAPIKey
-var email = context.getVariable("developer.email");
+// 1. Get requester email (prioritize google.email from Google OAuth token, then developer.email)
+var email = context.getVariable("google.email");
+if (!email) {
+    email = context.getVariable("developer.email");
+}
+if (!email) {
+    email = context.getVariable("verifyapikey.VA-VerifyAPIKey.developer.email");
+}
 if (!email) {
     email = "unknown_user";
 }
