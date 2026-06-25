@@ -260,10 +260,6 @@ Ensure your `~/.claude/settings.json` is configured to route calls via your Apig
 }
 ```
 
-> [!NOTE]
-> * `ANTHROPIC_MODEL`은 필요에 따라 `"claude-opus-4-8"` 등으로 변경하여 설정할 수 있습니다.
-> * `CLOUD_ML_REGION` 설정 시 Apigee 프록시가 해당 리전 정보를 기반으로 동적 백엔드 라우팅을 수행합니다.
-
 
 ## 🧹 Cleanup
 
