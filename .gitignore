@@ -5,8 +5,8 @@ set-env.sh
 
 # Terraform
 .terraform/
-*.tfstate
-*.tfstate.backup
+*.tfstate*
+*.backup*
 *.tfvars
 .terraform.lock.hcl
 
